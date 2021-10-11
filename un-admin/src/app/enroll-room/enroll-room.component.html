@@ -1,0 +1,110 @@
+<div class="screen-css">
+    <div class="row">
+        <div class="col-md-12">
+            <p-accordion>
+                <p-accordionTab [header]="getSelectedBlock()">
+                    <div *ngFor='let dept of departments' class="row">
+                        <div class="col-md-2">{{dept.departmentName}}</div>
+                        <div class="col-md-2">
+                            <p-checkbox name="groupname" [binary]="true" [(ngModel)]="dept.checked"></p-checkbox>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-3 ml-10" (click)='getDepartments()'>Get
+                        Room</button>
+                </p-accordionTab>
+                <p-accordionTab header="Selected Room">
+                    <div class="row" style="font-weight: 600;">
+                        <div class="col-md-2">
+                            Room Name
+                        </div>
+                        <div class="col-md-1">
+                            Number Of Row
+                        </div>
+                        <div class="col-md-1">
+                            Capacity Of Row
+                        </div>
+                        <div class="col-md-1">
+                            Selected
+                        </div>
+                    </div>
+                    <div *ngFor='let room of rooms' class="row">
+                        <div class="col-md-2">{{room.name}}</div>
+                        <div class="col-md-1">
+                            <input type="text" class="form-control" id="name" placeholder="Number of row"
+                                [(ngModel)]='room.noOfRow'>
+                        </div>
+                        <div class="col-md-1">
+                            <input type="text" class="form-control" id="name" placeholder="Row capacity"
+                                [(ngModel)]='room.rowCapacity'>
+                        </div>
+                        <div class="col-md-1">
+                            <p-checkbox name="groupname" [binary]="true" [(ngModel)]="room.checked"></p-checkbox>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="offset-md-4 col-md-2">
+                            Total Number of sits : &nbsp;&nbsp;&nbsp;&nbsp;
+                            <span style="font-weight: 600;">{{getCount()}}</span>
+                        </div>
+                    </div>
+                </p-accordionTab>
+                <p-accordionTab header="Assign Students">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="file" class="form-control" title="Upload" (change)="fileDataLoader($event)"
+                                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
+                        </div>
+                        <div class="col-md-4">
+                            <button pButton type="button" label="Upload" (click)="upload()"></button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p-accordion>
+                                <p-accordionTab  [header]="getSelectedRoomDetails(room)" *ngFor='let room of selectedRooms'>
+                                    <span *ngFor='let rollList of room.rollNumberList; let indexOfRoll = index'>
+                                        <b>C-{{indexOfRoll + 1}} </b><p-badge [value]="roll" styleClass="p-mr-4" *ngFor='let roll of rollList; ' class="mr-4"></p-badge>
+                                        <br>
+                                        <br>
+                                    </span>
+                                </p-accordionTab>
+                            </p-accordion>
+                            <div class="row">
+                                <div class="offset-md-4 col-md-2">
+                                    Total Number of sits : &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span style="font-weight: 600;">{{getCount()}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <p-accordion>
+                                <p-accordionTab  [header]="studentNameValue" *ngFor='let studentNameValue of students.studentNameList; let index = index'>
+                                    <div class="badges">
+                                        <p-badge [value]="st.roolNumber" styleClass="p-mr-4" *ngFor='let st of students.studentsList[index]' class="mr-4"></p-badge>
+                                    </div>
+                                </p-accordionTab>
+                            </p-accordion>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" style="text-align: center;">
+                            <button pButton type="button" label="Allocate Seat" (click)="assignSeats()" [disabled]='getAssignButtonStatus()'></button>
+                        </div>
+                    </div>
+                </p-accordionTab>
+                <p-accordionTab header="Report">
+                    <button type="submit" class="btn btn-primary mb-3 ml-10" (click)='exportStudentRoomAlwrtment()'>Get
+                        Export</button>
+                </p-accordionTab>
+            </p-accordion>
+        </div>
+        
+    </div>
+</div>
+ <!-- <p-badge [value]="'C'+(index + 1)" styleClass="p-mr-4" class="mr-4" 
+                                    *ngFor='let i of counter(room.rowCapacity); let index = index;'></p-badge> -->
+                                    <!-- <td *ngFor='let i of counter(room.rowCapacity); let index = index;' style="text-align: center;">
+                                        
+                                    </td>
+                                    <td>{{}}</td> -->

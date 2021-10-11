@@ -1,0 +1,22 @@
+/* You can add global styles to this file, and also import other style files */
+.screen-css{
+    padding-top: 15px
+}
+.ml-10{
+    margin-left: 10px;
+}
+.pi{
+    cursor: pointer;
+}
+.pi-selected{
+    color: #fbc02d;
+}
+body{
+    font-size: 18px !important;
+}
+td .pi{
+    margin-right: 14px;
+}
+.p-dropdown{
+    width: 100% !important;
+}

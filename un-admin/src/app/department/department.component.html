@@ -1,0 +1,45 @@
+<div class="screen-css">
+    <div class="row g-3">
+        <div class="col-2">
+            <label for="name" class="visually-hidden">Department Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Department Name" [(ngModel)]='dept.departmentName'>
+        </div>
+        <div class="col-2">
+            <label for="code" class="visually-hidden">Department Code</label>
+            <input type="text" class="form-control" id="code" placeholder="Department Code" [(ngModel)]='dept.departmentCode'>
+        </div>
+        <div class="col-2">
+            <button type="submit" class="btn btn-primary mb-3" (click)="save()" *ngIf="!dept.id && dept.departmentName">Save</button>
+            <button type="submit" class="btn btn-primary mb-3 ml-10" (click)='save()' *ngIf="dept.id && dept.departmentName">Update</button>
+            <button type="reset" class="btn btn-primary mb-3 ml-10" (click)='reset()'>Reset</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped" style="text-align: center;">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Department Name</th>
+                        <th scope="col">Department Code</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor='let data of departments; let i = index;'>
+                        <td>{{i + 1}}</td>
+                        <td>{{data.departmentName}}</td>
+                        <td>{{data.departmentCode}}</td>
+                        <td>
+                            <i class="pi pi-pencil" (click)='select(data)' *ngIf='data.id != dept.id'></i>
+                            <i class="pi pi-pencil pi-selected" (click)='select(data)' *ngIf='data.id == dept.id'></i>
+                            <i class="pi pi-trash" (click)='deleteConfirm(data)'></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
