@@ -27,10 +27,9 @@ import com.un.util.UNContsant;
 public class RpoomArrangementService {
 	String fontFamily = "Calibri";
 
-	public ResponseEntity<InputStreamResource> getRoomArrangementReport(HttpServletResponse response,
+	public byte[] getRoomArrangementReport(HttpServletResponse response,
 			ReportRoomDTO reportRoomDTO) throws IOException {
 
-		@SuppressWarnings("resource")
 		XWPFDocument document = new XWPFDocument();
 
 		XWPFHeaderFooterPolicy policy = document.createHeaderFooterPolicy();
@@ -47,11 +46,7 @@ public class RpoomArrangementService {
 		document.write(out);
 		out.close();
 		byte[] responseByteArray = out.toByteArray();
-		ResponseEntity<InputStreamResource> body = ReportResponseProvider.getResponse(response, responseByteArray,
-				"test.docx");
-		response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "*");
-		return body;
-
+		return responseByteArray;
 	}
 
 	private void getStudentDetailsReportTable(ReportRoomDTO reportRoomDTO, XWPFDocument document) {

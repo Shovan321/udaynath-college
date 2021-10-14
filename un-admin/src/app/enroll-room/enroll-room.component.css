@@ -1,3 +1,11 @@
 .mr-4{
     margin: 3px !important;
 }
+.section-heading-of-inv{
+    background: red;
+    text-align: center;
+    padding: 10px;
+}
+.item-box{
+    text-align: center;
+}

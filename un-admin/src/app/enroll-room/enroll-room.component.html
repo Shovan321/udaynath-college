@@ -97,14 +97,33 @@
                     <button type="submit" class="btn btn-primary mb-3 ml-10" (click)='exportStudentRoomAlwrtment()'>Get
                         Export</button>
                 </p-accordionTab>
+                <p-accordionTab header="Exam invigilator">
+                    <div class="container">
+                        <div class="row">
+                          <div [ngClass]='getWidthOfList()'>
+                              <div class="drag-container">
+                                  <div class="section-heading section-heading-of-inv">Invigilators </div>
+                                  <div cdkDropList #pendingList="cdkDropList" [cdkDropListData]="invigilators" [cdkDropListConnectedTo]="[doneList]"
+                                    class="item-list" (cdkDropListDropped)="drop($event)">
+                                    <div class="item-box" *ngFor="let item of invigilators" cdkDrag>{{item}}</div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div [ngClass]='getWidthOfList()' *ngFor='let sr of selectedRooms'>
+                              <div class="drag-container">
+                                  <div class="section-heading section-heading-of-inv">{{sr.name}}</div>
+                                  <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="done" [cdkDropListConnectedTo]="[pendingList]"
+                                    class="item-list" (cdkDropListDropped)="drop($event)">
+                                    <div class="item-box" *ngFor="let item of done" cdkDrag>{{item}}</div>
+                                  </div>
+                                </div>
+                          </div>
+
+                        </div>
+                    </div>
+                </p-accordionTab>
             </p-accordion>
         </div>
         
     </div>
 </div>
- <!-- <p-badge [value]="'C'+(index + 1)" styleClass="p-mr-4" class="mr-4" 
-                                    *ngFor='let i of counter(room.rowCapacity); let index = index;'></p-badge> -->
-                                    <!-- <td *ngFor='let i of counter(room.rowCapacity); let index = index;' style="text-align: center;">
-                                        
-                                    </td>
-                                    <td>{{}}</td> -->

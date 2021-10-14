@@ -128,5 +128,8 @@
       }
     }
   },
-  "defaultProject": "un-admin"
+  "defaultProject": "un-admin",
+  "cli": {
+    "analytics": "aeba7c8f-2a00-4da8-90f3-1b0ddb147af0"
+  }
 }

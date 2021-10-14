@@ -21,6 +21,7 @@ import {AccordionModule} from 'primeng/accordion';
 import {CheckboxModule} from 'primeng/checkbox';
 import {PanelModule} from 'primeng/panel';
 import {BadgeModule} from 'primeng/badge';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 const modules = [
   BrowserModule,
@@ -36,7 +37,8 @@ const modules = [
   AccordionModule,
   CheckboxModule,
   PanelModule,
-  BadgeModule
+  BadgeModule,
+  DragDropModule
 ];
 @NgModule({
   declarations: [
