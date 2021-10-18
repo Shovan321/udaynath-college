@@ -22,6 +22,7 @@ import {CheckboxModule} from 'primeng/checkbox';
 import {PanelModule} from 'primeng/panel';
 import {BadgeModule} from 'primeng/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MemoComponent } from './memo/memo.component';
 
 const modules = [
   BrowserModule,
@@ -46,7 +47,8 @@ const modules = [
     EmployeeComponent,
     DepartmentComponent,
     AssignRoomComponent,
-    EnrollRoomComponent
+    EnrollRoomComponent,
+    MemoComponent
   ],
   imports: [
     modules

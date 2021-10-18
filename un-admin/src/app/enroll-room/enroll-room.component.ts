@@ -8,7 +8,7 @@ import { RoomService } from '../services/room.service';
 import { StudentService } from '../services/student.service'
 import { StudentResponseDTO } from '../model/student.response';
 import { DashboardService } from '../services/dashboard.service'
-import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-enroll-room',
@@ -23,9 +23,13 @@ export class EnrollRoomComponent implements OnInit {
   constructor(private departmentsService: DepartmentService,
     private roomService: RoomService,
     private studentService: StudentService,
-    private dashboardService: DashboardService) { }
+    private dashboardService: DashboardService) {
+
+
+  }
 
   ngOnInit(): void {
+    this.invesilotersList = [];
     this.selectedRooms = [];
     this.students = new StudentResponseDTO();
     this.departmentsService.getAll().subscribe(res => {
@@ -67,6 +71,7 @@ export class EnrollRoomComponent implements OnInit {
     });
     return count;
   }
+
   fileList = []
   fileDataLoader(event) {
     this.fileList = event.target.files;
@@ -229,41 +234,65 @@ export class EnrollRoomComponent implements OnInit {
   }
   exportStudentRoomAlwrtment() {
     let body = {
-      'title' : 'Title',
-      'selectedRooms' : this.selectedRooms,
+      'title': 'Title',
+      'selectedRooms': this.selectedRooms,
 
     }
     this.dashboardService.getStudentArrangment(body);
   }
-  invigilators = [
-    'Get to work',
-    'Pick up groceries',
-    'Go home',
-    'Fall asleep'
-  ];
 
-  done = [
-    'Get up',
-    'Brush teeth',
-    'Take a shower',
-    'Check e-mail',
-    'Walk dog'
-  ];
+  getWidthOfList() {
+    if (this.selectedRooms && this.selectedRooms.length == 0) {
+      return "col-md-12";
+    } else {
+      return "col-md-" + Math.round(12 / (this.selectedRooms.length + 1));
+    }
+  }
+
+  selectedRoomsForInvesiloter = [];
+  connectedTo = [];
+
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
       transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex);
     }
   }
-  getWidthOfList(){
-    if(this.selectedRooms && this.selectedRooms.length == 0) {
-      return "col-md-12";
-    } else {
-      return "col-md-"+Math.round(12 / (this.selectedRooms.length + 1));
+
+  invesilotersList = [];
+  uploadInvesiloter() {
+    this.invesilotersList = [];
+    this.studentService.upload(this.fileList).subscribe((res: any) => {
+      this.invesilotersList = res.body['studentsList'][0];
+      this.setInvesiloterData();
+    });
+  }
+
+  setInvesiloterData() {
+
+    this.selectedRoomsForInvesiloter = [];
+    let currentDetials = {
+      id: 'Invesiloters',
+      invesiloters: this.invesilotersList
     }
+    this.selectedRoomsForInvesiloter.push(currentDetials);
+    for (let room of this.selectedRooms) {
+      let currentDetials = {
+        id: room.name,
+        invesiloters: [
+        ]
+      }
+      this.selectedRoomsForInvesiloter.push(currentDetials);
+    }
+    for (let week of this.selectedRoomsForInvesiloter) {
+      this.connectedTo.push(week.id);
+    };
+  }
+  exportInvesiloterList(){
+    console.log(this.selectedRoomsForInvesiloter);
   }
 }

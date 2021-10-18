@@ -61,9 +61,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <p-accordion>
-                                <p-accordionTab  [header]="getSelectedRoomDetails(room)" *ngFor='let room of selectedRooms'>
+                                <p-accordionTab [header]="getSelectedRoomDetails(room)"
+                                    *ngFor='let room of selectedRooms'>
                                     <span *ngFor='let rollList of room.rollNumberList; let indexOfRoll = index'>
-                                        <b>C-{{indexOfRoll + 1}} </b><p-badge [value]="roll" styleClass="p-mr-4" *ngFor='let roll of rollList; ' class="mr-4"></p-badge>
+                                        <b>C-{{indexOfRoll + 1}} </b>
+                                        <p-badge [value]="roll" styleClass="p-mr-4" *ngFor='let roll of rollList; '
+                                            class="mr-4"></p-badge>
                                         <br>
                                         <br>
                                     </span>
@@ -79,9 +82,11 @@
 
                         <div class="col-md-6">
                             <p-accordion>
-                                <p-accordionTab  [header]="studentNameValue" *ngFor='let studentNameValue of students.studentNameList; let index = index'>
+                                <p-accordionTab [header]="studentNameValue"
+                                    *ngFor='let studentNameValue of students.studentNameList; let index = index'>
                                     <div class="badges">
-                                        <p-badge [value]="st.roolNumber" styleClass="p-mr-4" *ngFor='let st of students.studentsList[index]' class="mr-4"></p-badge>
+                                        <p-badge [value]="st.roolNumber" styleClass="p-mr-4"
+                                            *ngFor='let st of students.studentsList[index]' class="mr-4"></p-badge>
                                     </div>
                                 </p-accordionTab>
                             </p-accordion>
@@ -89,7 +94,8 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12" style="text-align: center;">
-                            <button pButton type="button" label="Allocate Seat" (click)="assignSeats()" [disabled]='getAssignButtonStatus()'></button>
+                            <button pButton type="button" label="Allocate Seat" (click)="assignSeats()"
+                                [disabled]='getAssignButtonStatus()'></button>
                         </div>
                     </div>
                 </p-accordionTab>
@@ -98,32 +104,34 @@
                         Export</button>
                 </p-accordionTab>
                 <p-accordionTab header="Exam invigilator">
-                    <div class="container">
-                        <div class="row">
-                          <div [ngClass]='getWidthOfList()'>
-                              <div class="drag-container">
-                                  <div class="section-heading section-heading-of-inv">Invigilators </div>
-                                  <div cdkDropList #pendingList="cdkDropList" [cdkDropListData]="invigilators" [cdkDropListConnectedTo]="[doneList]"
-                                    class="item-list" (cdkDropListDropped)="drop($event)">
-                                    <div class="item-box" *ngFor="let item of invigilators" cdkDrag>{{item}}</div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div [ngClass]='getWidthOfList()' *ngFor='let sr of selectedRooms'>
-                              <div class="drag-container">
-                                  <div class="section-heading section-heading-of-inv">{{sr.name}}</div>
-                                  <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="done" [cdkDropListConnectedTo]="[pendingList]"
-                                    class="item-list" (cdkDropListDropped)="drop($event)">
-                                    <div class="item-box" *ngFor="let item of done" cdkDrag>{{item}}</div>
-                                  </div>
-                                </div>
-                          </div>
-
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="file" class="form-control" title="Upload" (change)="fileDataLoader($event)"
+                                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
+                        </div>
+                        <div class="col-md-4">
+                            <button pButton type="button" label="Upload" (click)="uploadInvesiloter()"></button>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-3" *ngFor="let room of selectedRoomsForInvesiloter">
+                            <div class="drag-container">
+                                <div class="section-heading">{{room.id}}</div>
+
+                                <div cdkDropList id="{{room.id}}" [cdkDropListData]="room.invesiloters"
+                                    [cdkDropListConnectedTo]="connectedTo" class="item-list"
+                                    (cdkDropListDropped)="drop($event)">
+                                    <div class="item-box" *ngFor="let weekItem of room.invesiloters" cdkDrag>
+                                        {{weekItem.name}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-3 ml-10" (click)='exportInvesiloterList()'>Get
+                        Export</button>
                 </p-accordionTab>
             </p-accordion>
         </div>
-        
+
     </div>
 </div>

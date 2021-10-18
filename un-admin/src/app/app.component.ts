@@ -20,6 +20,7 @@ export class AppComponent {
         /* {label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['employee']}, */
         {label: 'Room', icon: 'pi pi-fw pi-users', routerLink: ['assign-room']},
         {label: 'Enroll Room', icon: 'pi pi-fw pi-users', routerLink: ['enroll-room']},
+        {label: 'Memo', icon: 'pi pi-fw pi-users', routerLink: ['memo']},
     ];
 }
 }

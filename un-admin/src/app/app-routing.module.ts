@@ -4,6 +4,7 @@ import { AssignRoomComponent } from './assign-room/assign-room.component';
 import { DepartmentComponent } from './department/department.component';
 import { EmployeeComponent } from './employee/employee.component';
 import { EnrollRoomComponent } from './enroll-room/enroll-room.component';
+import { MemoComponent } from './memo/memo.component';
 
 const routes: Routes = [
   {
@@ -19,6 +20,9 @@ const routes: Routes = [
   {
     path:'enroll-room',
     component: EnrollRoomComponent
+  }, {
+    path: 'memo',
+    component: MemoComponent
   }
 ];
 
