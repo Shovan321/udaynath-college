@@ -59,14 +59,6 @@ public class StudentService {
 			return Double.valueOf(cell.getNumericCellValue()).longValue()+"";
 		} catch (Exception e) {
 		}
-		/*
-		 * if (cell != null) { CellType cellType = cell.getCellType(); switch (cellType)
-		 * { case CellType: return "" + cell.getBooleanCellValue(); case
-		 * Cell.CELL_TYPE_NUMERIC: return "" +
-		 * Double.valueOf(cell.getNumericCellValue()).longValue(); case
-		 * Cell.CELL_TYPE_STRING: return "" + cell.getStringCellValue(); } return data;
-		 * }
-		 */
 		return data;
 	}
 }

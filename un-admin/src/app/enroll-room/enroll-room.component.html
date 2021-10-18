@@ -116,7 +116,15 @@
                     <div class="row">
                         <div class="col-md-3" *ngFor="let room of selectedRoomsForInvesiloter">
                             <div class="drag-container">
-                                <div class="section-heading">{{room.id}}</div>
+                                <div class="section-heading">{{room.id}}
+                                    <span *ngIf="'Invesiloters' === room.id" class="shift-icon" (click)='autoAssignInvesiloter()' >
+                                        
+                                        A>> 
+                                    </span>
+                                    <input type="number" [(ngModel)]='invesiloterSize' *ngIf="'Invesiloters' === room.id" style="float: right;
+                                    width: 65px;
+                                    font-size: 13px;">
+                                </div>
 
                                 <div cdkDropList id="{{room.id}}" [cdkDropListData]="room.invesiloters"
                                     [cdkDropListConnectedTo]="connectedTo" class="item-list"

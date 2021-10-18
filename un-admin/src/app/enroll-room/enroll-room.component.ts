@@ -20,6 +20,7 @@ export class EnrollRoomComponent implements OnInit {
   departments: Department[] = [];
   rooms: Room[] = [];
   students = new StudentResponseDTO();
+  invesiloterSize = 0;
   constructor(private departmentsService: DepartmentService,
     private roomService: RoomService,
     private studentService: StudentService,
@@ -31,6 +32,7 @@ export class EnrollRoomComponent implements OnInit {
   ngOnInit(): void {
     this.invesilotersList = [];
     this.selectedRooms = [];
+    this.invesiloterSize = 0;
     this.students = new StudentResponseDTO();
     this.departmentsService.getAll().subscribe(res => {
       this.departments = res['data'];
@@ -241,14 +243,6 @@ export class EnrollRoomComponent implements OnInit {
     this.dashboardService.getStudentArrangment(body);
   }
 
-  getWidthOfList() {
-    if (this.selectedRooms && this.selectedRooms.length == 0) {
-      return "col-md-12";
-    } else {
-      return "col-md-" + Math.round(12 / (this.selectedRooms.length + 1));
-    }
-  }
-
   selectedRoomsForInvesiloter = [];
   connectedTo = [];
 
@@ -263,17 +257,16 @@ export class EnrollRoomComponent implements OnInit {
     }
   }
 
-  invesilotersList = [];
+  invesilotersList: any;;
   uploadInvesiloter() {
-    this.invesilotersList = [];
-    this.studentService.upload(this.fileList).subscribe((res: any) => {
-      this.invesilotersList = res.body['studentsList'][0];
+    this.invesilotersList = null;
+    this.studentService.uploadForInvesiloter('invesiloters', this.fileList).subscribe((res: any) => {
+      this.invesilotersList = res.body;
       this.setInvesiloterData();
     });
   }
 
   setInvesiloterData() {
-
     this.selectedRoomsForInvesiloter = [];
     let currentDetials = {
       id: 'Invesiloters',
@@ -292,7 +285,19 @@ export class EnrollRoomComponent implements OnInit {
       this.connectedTo.push(week.id);
     };
   }
-  exportInvesiloterList(){
+  exportInvesiloterList() {
     console.log(this.selectedRoomsForInvesiloter);
+  }
+
+  autoAssignInvesiloter() {
+
+    this.invesilotersList = null;
+    this.studentService.uploadForInvesiloter('invesiloters', this.fileList).subscribe((res: any) => {
+      this.invesilotersList = res.body;
+      this.setInvesiloterData();
+      this.studentService.manageRoomAndInvesiloter(this.selectedRoomsForInvesiloter, this.selectedRooms, this.invesiloterSize).subscribe(res => {
+        this.selectedRoomsForInvesiloter = res['alertsRooms'];
+      });
+    });
   }
 }

@@ -12,4 +12,15 @@ export class StudentService {
   upload(fileList){
     return this.apiService.postFile(this.path, fileList);
   }
+  uploadForInvesiloter(path,fileList){
+    return this.apiService.postFile(path, fileList);
+  }
+  manageRoomAndInvesiloter(data : any, rooms, sizeOfInvesiloter){
+    let obj = {
+      'alertsRooms': data,
+      'selectedRooms': rooms,
+      'invesiloterSize':sizeOfInvesiloter
+    }
+    return this.apiService.post("invesiloters/manage-invesiloter", obj);
+  }
 }
