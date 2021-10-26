@@ -6,14 +6,13 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class ReportRoomDTO {
+public class MemoReportRoomDTO {
 	String deptId;
 	String deptName;
 	String id;
 	String name;
 	String noOfRow;
-	List<List<String>> rollNumberList;
-	List<List<MemoRollNumber>> memoRollNumberList;
+	List<List<MemoRollNumber>> rollNumberList;
 	String rowCapacity;
 	String title;
 	Date date;

@@ -8,4 +8,5 @@ import lombok.Data;
 public class ReportDTO {
 	public String title;
 	public List<ReportRoomDTO> selectedRooms;
+	public List<RoomAndInvigilatorDetail> selectedRoomsForInvesiloter;
 }

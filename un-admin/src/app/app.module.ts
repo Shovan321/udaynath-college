@@ -23,6 +23,7 @@ import {PanelModule} from 'primeng/panel';
 import {BadgeModule} from 'primeng/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MemoComponent } from './memo/memo.component';
+import {DividerModule} from 'primeng/divider';
 
 const modules = [
   BrowserModule,
@@ -39,7 +40,8 @@ const modules = [
   CheckboxModule,
   PanelModule,
   BadgeModule,
-  DragDropModule
+  DragDropModule,
+  DividerModule
 ];
 @NgModule({
   declarations: [

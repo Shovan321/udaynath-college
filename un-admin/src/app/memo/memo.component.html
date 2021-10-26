@@ -1,1 +1,37 @@
-<p>memo works!</p>
+<!-- {{response | json}} -->
+<div class="row">
+    <div class="col-md-3">
+        <p-dropdown [options]="memoDetails.memoModels" [(ngModel)]="selectedMemo" optionLabel="name" [filter]="true"
+            filterBy="name" [showClear]="true" placeholder="Select a memo">
+        </p-dropdown>
+    </div>
+    <div class="col-md-3" *ngIf='selectedMemo.reportDTO'>
+        <button pButton type="button" icon="pi pi-download" 
+        label="Export Memo" iconPos="right"
+        (click)='export()'
+        ></button>
+    </div>
+</div>
+<div class="row" *ngIf='selectedMemo.reportDTO'>
+    <p-accordion>
+        <p-accordionTab [header]="getNameForHeader(item)" *ngFor='let item of selectedMemo.reportDTO.selectedRooms'
+            style="margin-top: 10px;" class="col-md-12">
+            <ng-template [ngIf]='item.memoRollNumberList && item.memoRollNumberList.length != 0'>
+                <div *ngFor='let itemRools of item.memoRollNumberList; let index = index' style="margin-bottom: 10px;">
+                    <div class="p-inputgroup">
+                        <span class="column-name-style">{{'C'}}{{index + 1}}</span>
+                        <div *ngFor='let st of itemRools' style="padding: 5px;">
+                            <span>
+                                {{st.rollMumber}}<p-checkbox [(ngModel)]="st.studentPresent" binary="true"
+                                    inputId="binary">
+                                </p-checkbox>
+                            </span>
+                        </div>
+                    </div>
+                    <p-divider></p-divider>
+                </div>
+            </ng-template>
+
+        </p-accordionTab>
+    </p-accordion>
+</div>

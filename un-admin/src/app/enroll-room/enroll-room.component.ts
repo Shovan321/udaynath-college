@@ -20,6 +20,7 @@ export class EnrollRoomComponent implements OnInit {
   departments: Department[] = [];
   rooms: Room[] = [];
   students = new StudentResponseDTO();
+  titleOfExam = '';
   invesiloterSize = 0;
   constructor(private departmentsService: DepartmentService,
     private roomService: RoomService,
@@ -33,6 +34,7 @@ export class EnrollRoomComponent implements OnInit {
     this.invesilotersList = [];
     this.selectedRooms = [];
     this.invesiloterSize = 0;
+    this.titleOfExam = '';
     this.students = new StudentResponseDTO();
     this.departmentsService.getAll().subscribe(res => {
       this.departments = res['data'];
@@ -236,9 +238,9 @@ export class EnrollRoomComponent implements OnInit {
   }
   exportStudentRoomAlwrtment() {
     let body = {
-      'title': 'Title',
+      'title': this.titleOfExam,
       'selectedRooms': this.selectedRooms,
-
+      'selectedRoomsForInvesiloter': this.selectedRoomsForInvesiloter
     }
     this.dashboardService.getStudentArrangment(body);
   }
@@ -281,8 +283,8 @@ export class EnrollRoomComponent implements OnInit {
       }
       this.selectedRoomsForInvesiloter.push(currentDetials);
     }
-    for (let week of this.selectedRoomsForInvesiloter) {
-      this.connectedTo.push(week.id);
+    for (let inv of this.selectedRoomsForInvesiloter) {
+      this.connectedTo.push(inv.id);
     };
   }
   exportInvesiloterList() {

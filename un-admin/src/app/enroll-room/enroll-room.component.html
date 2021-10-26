@@ -99,18 +99,25 @@
                         </div>
                     </div>
                 </p-accordionTab>
-                <p-accordionTab header="Report">
+                <!-- <p-accordionTab header="Report">
                     <button type="submit" class="btn btn-primary mb-3 ml-10" (click)='exportStudentRoomAlwrtment()'>Get
                         Export</button>
-                </p-accordionTab>
+                </p-accordionTab> -->
                 <p-accordionTab header="Exam invigilator">
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-6">
                             <input type="file" class="form-control" title="Upload" (change)="fileDataLoader($event)"
                                 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <button pButton type="button" label="Upload" (click)="uploadInvesiloter()"></button>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" [(ngModel)]='titleOfExam' class="form-control" placeholder="Title">
+                        </div>
+                        <div class="col-md-2" style="float:left">
+                        <button type="submit" class="btn btn-primary mb-3 ml-10" (click)='exportStudentRoomAlwrtment()'>
+                        Export</button>
                         </div>
                     </div>
                     <div class="row">
@@ -135,8 +142,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary mb-3 ml-10" (click)='exportInvesiloterList()'>Get
-                        Export</button>
+                   
                 </p-accordionTab>
             </p-accordion>
         </div>

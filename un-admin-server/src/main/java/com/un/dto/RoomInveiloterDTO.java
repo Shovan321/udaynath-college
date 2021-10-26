@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 public class RoomInveiloterDTO {
 	private List<AlertRoom> alertsRooms;
+	private Object selectedRooms;
 	int invesiloterSize = 1;
 }
