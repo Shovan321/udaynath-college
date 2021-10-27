@@ -24,6 +24,7 @@ import {BadgeModule} from 'primeng/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MemoComponent } from './memo/memo.component';
 import {DividerModule} from 'primeng/divider';
+import { HomeComponent } from './home/home.component';
 
 const modules = [
   BrowserModule,
@@ -50,7 +51,8 @@ const modules = [
     DepartmentComponent,
     AssignRoomComponent,
     EnrollRoomComponent,
-    MemoComponent
+    MemoComponent,
+    HomeComponent
   ],
   imports: [
     modules

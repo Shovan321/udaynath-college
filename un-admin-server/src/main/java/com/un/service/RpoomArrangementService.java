@@ -1,23 +1,29 @@
 package com.un.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.Comparator;
+import java.util.IntSummaryStatistics;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -25,69 +31,29 @@ import org.apache.poi.xwpf.usermodel.XWPFHeader;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.hibernate.engine.jdbc.StreamUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.un.dto.InvesilotersDTO;
+import com.un.dto.ReportDTO;
 import com.un.dto.ReportRoomDTO;
+import com.un.dto.RollNumberForSeatArrangement;
 import com.un.dto.RoomAndInvigilatorDetail;
 import com.un.util.ExcelUtil;
-import com.un.util.ReportResponseProvider;
 import com.un.util.UNContsant;
 
 @Service
 public class RpoomArrangementService {
+
+	@Autowired
+	SignetureSheetService signetureSheetService;
 	String fontFamily = "Calibri";
 
-	public byte[] getRoomArrangementReport(HttpServletResponse response, ReportRoomDTO reportRoomDTO)
-			throws IOException {
-
-		XWPFDocument document = new XWPFDocument();
-
-		XWPFHeaderFooterPolicy policy = document.createHeaderFooterPolicy();
-		if (policy.getDefaultHeader() == null && policy.getFirstPageHeader() == null
-				&& policy.getDefaultFooter() == null) {
-
-			createReportHeader(reportRoomDTO, policy);
-
-			getStudentDetailsReportTable(reportRoomDTO, document);
-
-		}
-
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		document.write(out);
-		out.close();
-		byte[] responseByteArray = out.toByteArray();
-		return responseByteArray;
-	}
-
-	private void getStudentDetailsReportTable(ReportRoomDTO reportRoomDTO, XWPFDocument document) {
-		XWPFTable table = document.createTable();
-		table.setWidth("100.00%");
-		XWPFTableRow row = table.getRow(0); // First row
-		// Columns
-		row.getCell(0).setText("Sl. No.");
-		row.addNewTableCell().setText("ROLL NO.");
-		row.addNewTableCell().setText("ROOM NO.");
-		row.addNewTableCell().setText("REG BACK");
-		row.addNewTableCell().setText("SITTING & TIMING");
-		int rowIndex = 1;
-		List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
-		for (List<String> list : rollNumberList) {
-			for (String rollNumber : list) {
-				XWPFTableRow newRow = table.createRow();
-				newRow.getCell(0).setText((rowIndex) + "");
-				newRow.getCell(1).setText(rollNumber);
-				rowIndex++;
-			}
-		}
-	}
-
 	private void createReportHeader(ReportRoomDTO reportRoomDTO, XWPFHeaderFooterPolicy policy) {
+		@SuppressWarnings("static-access")
 		XWPFHeader headerD = policy.createHeader(policy.DEFAULT);
 
 		setHeaderAndTitleText(headerD.createParagraph(), UNContsant.ROOM_ARRANGEMENT_HEADER, false);
@@ -109,82 +75,95 @@ public class RpoomArrangementService {
 		header.setFontFamily(fontFamily);
 	}
 
-	public byte[] getSeatChartArrangementReport(HttpServletResponse response, ReportRoomDTO reportRoomDTO, RoomAndInvigilatorDetail invDetails)
-			throws IOException, ParseException {
-		Workbook document = new HSSFWorkbook();
-		Sheet sheet = document.createSheet("Sheet");
+	public byte[] getSeatChartArrangementReport(HttpServletResponse response, ReportRoomDTO reportRoomDTO,
+			RoomAndInvigilatorDetail invDetails) throws IOException, ParseException {
+
+		String file = this.getClass().getResource("/static/Seat_Chart_Template.xlsx").getFile();
+		InputStream input = new FileInputStream(file);
+		Workbook document = new XSSFWorkbook(input);
+		Sheet sheet = document.getSheetAt(0);
 
 		List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
 
+		// CellStyle cellStyle = sheet.getRow(1).getCell(0).getCellStyle();
+
 		boolean headerRowPrintStatus = true;
-		Row headerRow = sheet.createRow(0);
+		Row headerRow = sheet.createRow(1);
 		Cell slTextCell = headerRow.createCell(0);
 		slTextCell.setCellValue("Sl.No.");
 		int lastRowIndex = 1;
-		for (int columnIndex = 1; columnIndex < rollNumberList.size(); columnIndex++) {
-			int incrementalCellForHeaderIndex = 1;
+		int headerColumnSize = rollNumberList.size();
+		for (int columnIndex = 1; columnIndex <= headerColumnSize; columnIndex++) {
+			Cell headerColumnCell = headerRow.createCell(columnIndex);
+			headerColumnCell.setCellValue("Row" + columnIndex);
 			List<String> oneRowData = rollNumberList.get(columnIndex - 1);
-			for (int rowIndex = 1; rowIndex <= oneRowData.size(); rowIndex++) {
+			for (int rowIndex = 2; rowIndex <= oneRowData.size() + 1; rowIndex++) {
 				Row row = sheet.getRow(rowIndex);
 				if (row == null) {
 					row = sheet.createRow(rowIndex);
 				}
 				if (headerRowPrintStatus) {
-					Cell headerColumnCell = headerRow.createCell(incrementalCellForHeaderIndex++);
-					headerColumnCell.setCellValue("Row" + rowIndex);
 					Cell slCell = row.createCell(0);
-					slCell.setCellValue(rowIndex);
+					slCell.setCellValue(rowIndex - 1);
 				}
 				Cell cell = row.createCell(columnIndex);
-				cell.setCellValue(oneRowData.get(rowIndex - 1));
+				cell.setCellValue(oneRowData.get(rowIndex - 2));
 				lastRowIndex = rowIndex + 1;
 			}
 			headerRowPrintStatus = false;
 		}
+		if (headerColumnSize < 6) {
+			for (int hi = headerColumnSize + 1; hi <= 6; hi++) {
+				Cell blankCell = headerRow.createCell(hi);
+				blankCell.setCellValue("Row" + hi);
+			}
+		}
+		int breakRowIndex = lastRowIndex;
 		List<InvesilotersDTO> invesiloters = invDetails.getInvesiloters();
 		Row invRow = sheet.createRow(lastRowIndex++);
 		Cell invCell = invRow.createCell(0);
 		invCell.setCellValue("INVIGILATORS");
-		if(invesiloters == null) {
+		ExcelUtil.mergeCell(sheet, lastRowIndex - 1, lastRowIndex - 1, 0, 1);
+		if (invesiloters == null) {
 			invesiloters = new ArrayList<>();
 		}
 		int resultCellRowIndex = lastRowIndex;
-		for(InvesilotersDTO inv : invesiloters) {
+		for (InvesilotersDTO inv : invesiloters) {
 			invRow = sheet.createRow(lastRowIndex++);
 			invCell = invRow.createCell(0);
 			invRow.createCell(1);
 			invCell.setCellValue(inv.getName());
-			ExcelUtil.mergeCell(sheet, lastRowIndex-1, lastRowIndex-1, 0, 1);
+			ExcelUtil.mergeCell(sheet, lastRowIndex - 1, lastRowIndex - 1, 0, 1);
 		}
-		
+
 		lastRowIndex = resultCellRowIndex;
 		List<String> textList = Arrays.asList("REGULAR", "TOTAL");
-		for(int i = 0; i< 2; i++) {
+		for (int i = 0; i < 2; i++) {
 			invRow = sheet.getRow(lastRowIndex++);
-			if(invRow == null) {
+			if (invRow == null) {
 				lastRowIndex = lastRowIndex - 1;
-				invRow = sheet.createRow(lastRowIndex++);				
+				invRow = sheet.createRow(lastRowIndex++);
 			}
 			invCell = invRow.createCell(2);
 			invCell.setCellValue(textList.get(i));
 			invRow.createCell(3);
-			ExcelUtil.mergeCell(sheet, lastRowIndex-1, lastRowIndex-1, 2, 3);
+			ExcelUtil.mergeCell(sheet, lastRowIndex - 1, lastRowIndex - 1, 2, 3);
 		}
-		
+
 		lastRowIndex = resultCellRowIndex;
 		textList = Arrays.asList("TOTAL", "PRESENT", "ABSENT");
-		for(int i = 0; i< 3; i++) {
+		for (int i = 0; i < 3; i++) {
 			invRow = sheet.getRow(lastRowIndex++);
-			if(invRow == null) {
+			if (invRow == null) {
 				lastRowIndex = lastRowIndex - 1;
-				invRow = sheet.createRow(lastRowIndex++);				
+				invRow = sheet.createRow(lastRowIndex++);
 			}
 			invCell = invRow.createCell(4);
 			invCell.setCellValue(textList.get(i));
 			invRow.createCell(5);
-			ExcelUtil.mergeCell(sheet, lastRowIndex-1, lastRowIndex-1, 4, 5);
+			ExcelUtil.mergeCell(sheet, lastRowIndex - 1, lastRowIndex - 1, 4, 5);
 		}
-		ExcelUtil.setCellBorder(document, sheet);
+		ExcelUtil.setCellBorder(document, sheet, breakRowIndex);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		document.write(out);
 		document.close();
@@ -193,4 +172,105 @@ public class RpoomArrangementService {
 		return responseByteArray;
 	}
 
+	public byte[] getRoomArrangementReport(HttpServletResponse response, ReportDTO dto, ZipOutputStream zipOut)
+			throws IOException {
+
+		XWPFDocument document = new XWPFDocument();
+
+		XWPFTable table = document.createTable();
+		table.setWidth("100.00%");
+		XWPFTableRow row = table.getRow(0); // First row
+		// Columns
+		row.getCell(0).setText("Sl. No.");
+		row.addNewTableCell().setText("ROLL NO.");
+		row.addNewTableCell().setText("ROOM NO.");
+		row.addNewTableCell().setText("REG BACK");
+		row.addNewTableCell().setText("SITTING & TIMING");
+
+		List<ReportRoomDTO> selectedRooms = dto.getSelectedRooms();
+
+		boolean firstTime = true;
+		int rowIndex = 1;
+		for (ReportRoomDTO reportRoomDTO : selectedRooms) {
+			if (firstTime) {
+				reportRoomDTO.setTitle(dto.getTitle().toUpperCase());
+				XWPFHeaderFooterPolicy policy = document.createHeaderFooterPolicy();
+				if (policy.getDefaultHeader() == null && policy.getFirstPageHeader() == null
+						&& policy.getDefaultFooter() == null) {
+
+					createReportHeader(reportRoomDTO, policy);
+				}
+				firstTime = false;
+			}
+
+			List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
+			if (rollNumberList == null || rollNumberList.isEmpty()) {
+				continue;
+			}
+			List<String> rollNumberSortedList = rollNumberList.stream().flatMap(m -> m.stream())
+					.filter(p -> p != null && !p.isEmpty()).sorted(Comparator.comparing(String::valueOf))
+					.collect(Collectors.toList());
+
+			List<RollNumberForSeatArrangement> seatArrangement = new ArrayList<>();
+			for (String data : rollNumberSortedList) {
+				RollNumberForSeatArrangement roll = new RollNumberForSeatArrangement();
+				int length = data.length();
+				String prefix = data.substring(0, length - 3);
+				roll.setPrefix(prefix);
+				roll.setRollNumber(Integer.valueOf(data.substring(length - 3)));
+				seatArrangement.add(roll);
+			}
+
+			Map<String, List<RollNumberForSeatArrangement>> studentSeatValue = seatArrangement.stream()
+					.collect(Collectors.groupingBy(RollNumberForSeatArrangement::getPrefix));
+
+			Set<String> keySet = studentSeatValue.keySet();
+			for (String prefix : keySet) {
+				List<RollNumberForSeatArrangement> rollPerRoom = studentSeatValue.get(prefix);
+				IntSummaryStatistics collect = rollPerRoom.stream()
+						.collect(Collectors.summarizingInt(RollNumberForSeatArrangement::getRollNumber));
+				int max = collect.getMax();
+				int min = collect.getMin();
+				String name = reportRoomDTO.getName();
+				rowIndex = getStudentDetailsReportTable(table, rowIndex, max, min, prefix, name, document);
+				signetureSheetService.generateSignetureSheet(reportRoomDTO, prefix, rollPerRoom, zipOut);
+			}
+		}
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		document.write(out);
+		out.close();
+		document.close();
+		byte[] responseByteArray = out.toByteArray();
+		ZipEntry zipEntry = new ZipEntry("Room Arrangement" + ".docx");
+		zipEntry.setSize(responseByteArray.length);
+		zipOut.putNextEntry(zipEntry);
+
+		InputStream inputStream = new ByteArrayInputStream(responseByteArray);
+		StreamUtils.copy(inputStream, zipOut);
+		zipOut.closeEntry();
+		return responseByteArray;
+	}
+
+	private int getStudentDetailsReportTable(XWPFTable table, int rowIndex, int max, int min, String prefix,
+			String name, XWPFDocument document) {
+		XWPFTableRow newRow = table.createRow();
+		newRow.getCell(0).setText((rowIndex) + "");
+		String minPrefix = getDataWithPrefix(min);
+		String maxPrefix = getDataWithPrefix(max);
+		XWPFTableCell cell = newRow.getCell(1);
+		cell.setText(prefix + minPrefix + " TO " + prefix + maxPrefix);
+		newRow.getCell(2).setText(name);
+		return rowIndex + 1;
+	}
+
+	String getDataWithPrefix(int number) {
+		if (number <= 9) {
+			return "00" + number;
+		} else if (number <= 99) {
+			return "0" + number;
+		} else {
+			return "" + number;
+		}
+	}
 }

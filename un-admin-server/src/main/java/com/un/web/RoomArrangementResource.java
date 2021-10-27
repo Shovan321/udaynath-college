@@ -29,46 +29,35 @@ import com.un.service.RpoomArrangementService;
 public class RoomArrangementResource {
 	@Autowired
 	private RpoomArrangementService service;
-	
+
 	@Autowired
 	private MemoService memoService;
-	
-	@PostMapping(value = "/room-arrangement", produces="application/zip")
-	public void downloadRoomArrangementDetails(HttpServletResponse response,@RequestBody ReportDTO dto) throws IOException, ParseException {
+
+	@PostMapping(value = "/room-arrangement", produces = "application/zip")
+	public void downloadRoomArrangementDetails(HttpServletResponse response, @RequestBody ReportDTO dto)
+			throws IOException, ParseException {
 		ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream());
+
+		service.getRoomArrangementReport(response, dto, zipOut);
+		
 		List<ReportRoomDTO> selectedRooms = dto.getSelectedRooms();
-		for (ReportRoomDTO reportRoomDTO : selectedRooms) {
-			List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
-			if(rollNumberList == null || rollNumberList.isEmpty()) {
-				continue;
-			}
-			reportRoomDTO.setTitle(dto.getTitle().toUpperCase());
-			byte[] roomArrangementReport = service.getRoomArrangementReport(response, reportRoomDTO);
-			
-			String name = reportRoomDTO.getName();
-			ZipEntry zipEntry = new ZipEntry(name +"- Room Arrangement"+".docx");
-			zipEntry.setSize(roomArrangementReport.length);
-			zipOut.putNextEntry(zipEntry);
-			
-			InputStream inputStream = new ByteArrayInputStream(roomArrangementReport);
-			StreamUtils.copy(inputStream, zipOut);
-			zipOut.closeEntry();
-		}
 		List<RoomAndInvigilatorDetail> selectedRoomsForInvesiloter = dto.getSelectedRoomsForInvesiloter();
 		for (ReportRoomDTO reportRoomDTO : selectedRooms) {
 			List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
-			if(rollNumberList == null || rollNumberList.isEmpty()) {
+			if (rollNumberList == null || rollNumberList.isEmpty()) {
 				continue;
 			}
-			RoomAndInvigilatorDetail invDetails = selectedRoomsForInvesiloter.stream().filter(r -> r.getId().equals(reportRoomDTO.getName())).findAny().orElse(new RoomAndInvigilatorDetail());
+			RoomAndInvigilatorDetail invDetails = selectedRoomsForInvesiloter.stream()
+					.filter(r -> r.getId().equals(reportRoomDTO.getName())).findAny()
+					.orElse(new RoomAndInvigilatorDetail());
 			reportRoomDTO.setTitle(dto.getTitle().toUpperCase());
 			byte[] roomArrangementReport = service.getSeatChartArrangementReport(response, reportRoomDTO, invDetails);
-			
+
 			String name = reportRoomDTO.getName();
-			ZipEntry zipEntry = new ZipEntry(name+"- Seat Chart"+".xls");
+			ZipEntry zipEntry = new ZipEntry(name + "- Seat Chart" + ".xlsx");
 			zipEntry.setSize(roomArrangementReport.length);
 			zipOut.putNextEntry(zipEntry);
-			
+
 			InputStream inputStream = new ByteArrayInputStream(roomArrangementReport);
 			StreamUtils.copy(inputStream, zipOut);
 			zipOut.closeEntry();
@@ -77,7 +66,7 @@ public class RoomArrangementResource {
 		zipOut.finish();
 		zipOut.close();
 		response.setStatus(HttpServletResponse.SC_OK);
-		String zipFileName="room-memo.zip";
+		String zipFileName = "room-memo.zip";
 		response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "*");
 		response.addHeader("file-name", zipFileName);
 		response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipFileName + "\"");
