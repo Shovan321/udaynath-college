@@ -52,7 +52,9 @@ public class SignetureSheetService {
 				int cellNumber = 0;
 				Row signetureRow = outputSheet.createRow(rowNmber++);
 				Cell cell = signetureRow.createCell(cellNumber++);
-				cell.setCellValue(roll.getPrefix() + roll.getRollNumber());
+				String rollNumber = getDataWithPrefix(roll.getRollNumber());
+				
+				cell.setCellValue(roll.getPrefix() + rollNumber);
 			}
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -69,6 +71,15 @@ public class SignetureSheetService {
 			zipOut.closeEntry();
 		} catch (IOException e) {
 			log.error(e.getMessage());
+		}
+	}
+	String getDataWithPrefix(int number) {
+		if (number <= 9) {
+			return "00" + number;
+		} else if (number <= 99) {
+			return "0" + number;
+		} else {
+			return "" + number;
 		}
 	}
 }

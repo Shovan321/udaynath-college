@@ -26,6 +26,9 @@
                         <div class="col-md-1">
                             Selected
                         </div>
+                        <div class="col-md-1">
+                            <i class="pi pi-download" style="font-size: 2rem" pTooltip="Get rooms" (click)='getDepartments()'></i>
+                        </div>
                     </div>
                     <div *ngFor='let room of rooms' class="row">
                         <div class="col-md-2">{{room.name}}</div>
@@ -118,7 +121,9 @@
                         </div>
                         <div class="col-md-3" style="float:left">
                             <button type="submit" class="btn btn-primary mb-3 ml-10"
-                                (click)='exportStudentRoomAlwrtment()' [disabled]='getAssignButtonStatus()'>
+                                (click)='exportStudentRoomAlwrtment()' [disabled]='getAssignButtonStatus()'
+                                *ngIf='titleOfExam'
+                                >
                                 Save/Export</button>
 
                                 <button type="submit" class="btn btn-primary mb-3 ml-10"

@@ -20,3 +20,12 @@ td .pi{
 .p-dropdown{
     width: 100% !important;
 }
+.body-background{
+    background-color: white;
+}
+.pi{
+    color: #70dbfe;
+}
+.btn-primary, .p-button{
+    background-color: #16627b !important;
+}

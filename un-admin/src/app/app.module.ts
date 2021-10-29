@@ -25,6 +25,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MemoComponent } from './memo/memo.component';
 import {DividerModule} from 'primeng/divider';
 import { HomeComponent } from './home/home.component';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 const modules = [
   BrowserModule,
@@ -58,7 +59,9 @@ const modules = [
   imports: [
     modules
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService, MessageService,
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

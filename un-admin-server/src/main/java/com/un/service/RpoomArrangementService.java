@@ -107,7 +107,8 @@ public class RpoomArrangementService {
 					slCell.setCellValue(rowIndex - 1);
 				}
 				Cell cell = row.createCell(columnIndex);
-				cell.setCellValue(oneRowData.get(rowIndex - 2));
+				String value = oneRowData.get(rowIndex - 2);
+				cell.setCellValue(value);
 				lastRowIndex = rowIndex + 1;
 			}
 			headerRowPrintStatus = false;
