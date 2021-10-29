@@ -9,6 +9,9 @@ import { StudentService } from '../services/student.service'
 import { StudentResponseDTO } from '../model/student.response';
 import { DashboardService } from '../services/dashboard.service'
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { MemoService } from '../services/memo.service';
+import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/api';
+import { NotificationService } from '../notification.service';
 
 @Component({
   selector: 'app-enroll-room',
@@ -25,7 +28,10 @@ export class EnrollRoomComponent implements OnInit {
   constructor(private departmentsService: DepartmentService,
     private roomService: RoomService,
     private studentService: StudentService,
-    private dashboardService: DashboardService) {
+    private dashboardService: DashboardService,
+    private memoService: MemoService,
+    private confirmationService: ConfirmationService,
+    private notificationService: NotificationService) {
 
 
   }
@@ -85,6 +91,7 @@ export class EnrollRoomComponent implements OnInit {
     this.students = new StudentResponseDTO();
     this.studentService.upload(this.fileList).subscribe((res: any) => {
       this.students = res.body;
+      this.assignSeats();
     });
   }
   getSelectedRoomDetails(room: Room) {
@@ -220,18 +227,36 @@ export class EnrollRoomComponent implements OnInit {
 
     }
   }
+  alloctaedSeatCount = 0;
+  uploadedSTudentCounts = 0;
   getAssignButtonStatus() {
-    /* let seatCount = this.getCount();
-    let countOfStudent = 0;
-    if (this.students && this.students.keys && this.students.keys.length != 0)
-      this.students.forEach((value: Student[], key: string) => {
-        countOfStudent = countOfStudent + value.length;
-      });
-    if (seatCount >= countOfStudent) {
-      return false;
-    } else {
+    if (!this.selectedRooms || !this.students || !this.students.studentsList) {
+      return;
+    }
+    let alloctaedSeatCount = 0;
+    for (let room of this.selectedRooms) {
+      if (room && room.rollNumberList) {
+        for (let rolls of room.rollNumberList) {
+          if (rolls != null) {
+            alloctaedSeatCount = alloctaedSeatCount + rolls.length;
+          }
+        }
+      }
+    }
+    let uploadedSTudentCounts = 0;
+    for (let li of this.students.studentsList) {
+      if (li != null) {
+        uploadedSTudentCounts = uploadedSTudentCounts + li.length
+      }
+    }
+
+    this.alloctaedSeatCount = alloctaedSeatCount;
+    this.uploadedSTudentCounts = uploadedSTudentCounts;
+    if (alloctaedSeatCount < uploadedSTudentCounts && alloctaedSeatCount != 0 && uploadedSTudentCounts != 0) {
       return true;
-    } */
+    } else {
+      return false;
+    }
   }
   counter(i: number) {
     return new Array(i);
@@ -276,12 +301,20 @@ export class EnrollRoomComponent implements OnInit {
     }
     this.selectedRoomsForInvesiloter.push(currentDetials);
     for (let room of this.selectedRooms) {
-      let currentDetials = {
-        id: room.name,
-        invesiloters: [
-        ]
+      if (room.rollNumberList != null && room.rollNumberList.length != 0) {
+        let studentCount = 0;
+        for (let rools of room.rollNumberList) {
+          studentCount = studentCount + rools.length;
+        }
+        if (studentCount != 0) {
+          let currentDetials = {
+            id: room.name,
+            invesiloters: [
+            ]
+          }
+          this.selectedRoomsForInvesiloter.push(currentDetials);
+        }
       }
-      this.selectedRoomsForInvesiloter.push(currentDetials);
     }
     for (let inv of this.selectedRoomsForInvesiloter) {
       this.connectedTo.push(inv.id);
@@ -300,6 +333,22 @@ export class EnrollRoomComponent implements OnInit {
       this.studentService.manageRoomAndInvesiloter(this.selectedRoomsForInvesiloter, this.selectedRooms, this.invesiloterSize).subscribe(res => {
         this.selectedRoomsForInvesiloter = res['alertsRooms'];
       });
+    });
+  }
+  reAssignSeats() {
+    this.assignSeats();
+    this.getAssignButtonStatus();
+  }
+  deleteMemoData() {
+    let self = this;
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete <b> ${self.titleOfExam} </b>?`,
+      accept: () => {
+        self.memoService.delete(self.titleOfExam).subscribe(res => {
+          self.notificationService.showSuccess('Successfully deleted', 'Memo');
+          self.titleOfExam = '';
+        });
+      }
     });
   }
 }

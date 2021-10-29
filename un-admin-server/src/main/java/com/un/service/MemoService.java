@@ -78,4 +78,11 @@ public class MemoService {
 		}
 		return reportDTO;
 	}
+
+	public void delete(String examName) {
+		List<MemoDetails> findByName = memoRepo.findByName(examName);
+		for (MemoDetails memoDetails : findByName) {
+			memoRepo.delete(memoDetails);			
+		}
+	}
 }

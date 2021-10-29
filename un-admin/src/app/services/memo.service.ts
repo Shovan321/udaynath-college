@@ -6,6 +6,7 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class MemoService {
+  
 
   path = 'memo'
   constructor(private apiService : ApiService) { }
@@ -16,5 +17,9 @@ export class MemoService {
 
   export(selectedMemo: MemoDetail) {
     return this.apiService.postForBlob(this.path ,selectedMemo);
+  }
+
+  delete(titleOfExam: string) {
+    return this.apiService.delete(`${this.path+'/'+titleOfExam}`);
   }
 }

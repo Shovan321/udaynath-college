@@ -16,11 +16,11 @@ export class AppComponent {
   ngOnInit() {
     this.items = [
         {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['home']},
-        {label: 'Block', icon: 'pi pi-fw pi-users', routerLink: ['department']},
+        {label: 'Block', icon: 'pi pi-fw pi-table', routerLink: ['department']},
         /* {label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['employee']}, */
-        {label: 'Room', icon: 'pi pi-fw pi-users', routerLink: ['assign-room']},
-        {label: 'Enroll Room', icon: 'pi pi-fw pi-users', routerLink: ['enroll-room']},
-        {label: 'Memo', icon: 'pi pi-fw pi-users', routerLink: ['memo']},
+        {label: 'Room', icon: 'pi pi-fw pi-ticket', routerLink: ['assign-room']},
+        {label: 'Enrollment', icon: 'pi pi-fw pi-cog', routerLink: ['enroll-room']},
+        {label: 'Memo', icon: 'pi pi-fw pi-wallet', routerLink: ['memo']},
     ];
 }
 }

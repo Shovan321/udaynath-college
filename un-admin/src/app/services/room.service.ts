@@ -6,6 +6,7 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class RoomService {
+  
 
 
   constructor(private apiService: ApiService) { }
@@ -21,5 +22,9 @@ export class RoomService {
 
   findByBlockIds(selectedIds: any[]) {
     return this.apiService.get(this.path+'/'+selectedIds);
+  }
+
+  delete(id: any) {
+    return this.apiService.delete(this.path+'/'+id);
   }
 }

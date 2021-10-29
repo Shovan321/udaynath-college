@@ -5,7 +5,13 @@
             filterBy="name" [showClear]="true" placeholder="Select a memo">
         </p-dropdown>
     </div>
+
     <div class="col-md-3" *ngIf='selectedMemo.reportDTO'>
+        <button pButton type="button" icon="pi pi-trash" 
+        label="Delete Memo" iconPos="right"
+        (click)='deleteMemoData()'
+        ></button>
+        &nbsp;&nbsp;&nbsp;
         <button pButton type="button" icon="pi pi-download" 
         label="Export Memo" iconPos="right"
         (click)='export()'
@@ -35,3 +41,4 @@
         </p-accordionTab>
     </p-accordion>
 </div>
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>

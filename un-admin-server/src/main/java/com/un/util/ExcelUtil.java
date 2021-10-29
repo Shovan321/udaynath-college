@@ -27,7 +27,6 @@ public class ExcelUtil {
 		style.setBorderTop(BorderStyle.THIN);
 		style.setBorderRight(BorderStyle.THIN);
 		style.setBorderLeft(BorderStyle.THIN);
-		
 
 		style.setVerticalAlignment(VerticalAlignment.CENTER);
 		style.setAlignment(HorizontalAlignment.CENTER);
@@ -58,6 +57,7 @@ public class ExcelUtil {
 			}
 		}
 
+		int cellWidth = (12 * 256) + 200;// ([number from step 2] * 256) + 200
 		int rowIndex = 0;
 		for (Row row : sheet) {
 
@@ -65,7 +65,7 @@ public class ExcelUtil {
 				continue;
 			}
 			for (int i = 0; i < maxCell; i++) {
-				sheet.autoSizeColumn(i);
+				sheet.setColumnWidth(i, cellWidth);
 				Cell cell = row.getCell(i);
 				if (cell == null) {
 					cell = row.createCell(i);

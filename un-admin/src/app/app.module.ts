@@ -14,7 +14,7 @@ import { ButtonModule } from 'primeng/button';
 import { DepartmentComponent } from './department/department.component';
 import { HttpClientModule } from '@angular/common/http'
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { AssignRoomComponent } from './assign-room/assign-room.component';
 import { EnrollRoomComponent } from './enroll-room/enroll-room.component';
 import {AccordionModule} from 'primeng/accordion';
@@ -42,7 +42,8 @@ const modules = [
   PanelModule,
   BadgeModule,
   DragDropModule,
-  DividerModule
+  DividerModule,
+  
 ];
 @NgModule({
   declarations: [
@@ -57,7 +58,7 @@ const modules = [
   imports: [
     modules
   ],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

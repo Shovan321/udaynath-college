@@ -64,4 +64,8 @@ public class RoomService {
 		return dtos;
 	}
 
+	public void delete(Long roomId) {
+		roomRepo.deleteById(roomId);
+	}
+
 }

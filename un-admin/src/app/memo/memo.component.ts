@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MemoService } from '../services/memo.service';
 import { MemoDetail, ReportDTO, MemoReportModel } from '../model/report-model';
+import { ConfirmationService } from 'primeng/api';
+import { NotificationService } from '../notification.service';
 
 @Component({
   selector: 'app-memo',
@@ -9,12 +11,17 @@ import { MemoDetail, ReportDTO, MemoReportModel } from '../model/report-model';
 })
 export class MemoComponent implements OnInit {
 
-  constructor(private memoService: MemoService) { }
+  constructor(private memoService: MemoService,
+    private confirmationService : ConfirmationService,
+    private notificationService : NotificationService) { }
   memoDetails: MemoReportModel = new MemoReportModel();
   selectedMemo: MemoDetail = new MemoDetail();
   ngOnInit(): void {
     this.memoDetails = new MemoReportModel();;
     this.selectedMemo = new MemoDetail();
+    this.findAll();
+  }
+  findAll() {
     this.memoService.getAll().subscribe((res: MemoReportModel) => {
       this.memoDetails = res;
     });
@@ -42,6 +49,20 @@ export class MemoComponent implements OnInit {
       text = text + " A:" + absentLength;
     }
     return item.name + "  ( "+text+ " )";
+  }
+
+  deleteMemoData() {
+    let self = this;
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete <b> ${self.selectedMemo.name} </b>?`,
+      accept: () => {
+        self.memoService.delete(self.selectedMemo.name).subscribe(res => {
+          self.notificationService.showSuccess('Successfully deleted', 'Memo');
+          this.selectedMemo = new MemoDetail();
+          this.findAll();
+        });
+      }
+    });
   }
 
   export(){

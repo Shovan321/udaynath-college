@@ -4,6 +4,7 @@ import { DepartmentService } from '../services/department.service';
 import { RoomService } from '../services/room.service';
 import {Room} from '../model/room';
 import { NotificationService } from '../notification.service';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-assign-room',
@@ -17,6 +18,7 @@ export class AssignRoomComponent implements OnInit {
   rooms = [];
   constructor(private roomService: RoomService,
     private departmentService : DepartmentService,
+    private confirmationService : ConfirmationService,
     private notifyService : NotificationService) { }
 
   ngOnInit(): void {
@@ -56,5 +58,19 @@ export class AssignRoomComponent implements OnInit {
     } else{
       return false;
     }
+  }
+  deleteConfirm(room){
+    let self = this;
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete <b> ${room.name} </b>?`,
+      accept: () => {
+        self.delete(room);
+      }
+    });
+  }
+  delete(room){
+    this.roomService.delete(room.id).subscribe(res => {
+      this.findAll();
+    });
   }
 }

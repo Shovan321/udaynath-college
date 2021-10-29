@@ -6,4 +6,5 @@ import lombok.Data;
 public class RollNumberForSeatArrangement {
 	private String prefix;
 	private Integer rollNumber;
+	private boolean present;
 }
