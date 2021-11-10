@@ -91,7 +91,7 @@ public class RpoomArrangementService {
 		Row headerRow = sheet.createRow(1);
 		Cell slTextCell = headerRow.createCell(0);
 		slTextCell.setCellValue("Sl.No.");
-		int lastRowIndex = 1;
+		int lastRowIndex = rollNumberList.stream().max(Comparator.comparing(List::size)).get().size() + 2;
 		int headerColumnSize = rollNumberList.size();
 		for (int columnIndex = 1; columnIndex <= headerColumnSize; columnIndex++) {
 			Cell headerColumnCell = headerRow.createCell(columnIndex);
@@ -109,7 +109,6 @@ public class RpoomArrangementService {
 				Cell cell = row.createCell(columnIndex);
 				String value = oneRowData.get(rowIndex - 2);
 				cell.setCellValue(value);
-				lastRowIndex = rowIndex + 1;
 			}
 			headerRowPrintStatus = false;
 		}
