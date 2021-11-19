@@ -15,6 +15,14 @@
 	<packaging>war</packaging>
 	<name>un-admin-server</name>
 	<description>UN Server</description>
+
+	<repositories>
+		<repository>
+			<id>AsposeJavaAPI</id>
+			<name>Aspose Java API</name>
+			<url>https://repository.aspose.com/repo/</url>
+		</repository>
+	</repositories>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
@@ -82,6 +90,18 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.aspose</groupId>
+			<artifactId>aspose-cells</artifactId>
+			<version>20.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.aspose</groupId>
+			<artifactId>aspose-words</artifactId>
+			<version>20.4</version>
+			<classifier>shaping-harfbuzz-plugin</classifier>
 		</dependency>
 	</dependencies>
 
