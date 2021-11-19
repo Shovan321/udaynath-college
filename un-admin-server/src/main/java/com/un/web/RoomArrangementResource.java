@@ -54,7 +54,7 @@ public class RoomArrangementResource {
 			byte[] roomArrangementReport = service.getSeatChartArrangementReport(response, reportRoomDTO, invDetails);
 
 			String name = reportRoomDTO.getName();
-			ZipEntry zipEntry = new ZipEntry(name + "- Seat Chart" + ".xlsx");
+			ZipEntry zipEntry = new ZipEntry(name + "- Seat Chart" + ".docx");
 			zipEntry.setSize(roomArrangementReport.length);
 			zipOut.putNextEntry(zipEntry);
 

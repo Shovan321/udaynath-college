@@ -25,6 +25,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
+import org.apache.poi.xwpf.usermodel.ICell;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFHeader;
@@ -33,7 +34,9 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell.XWPFVertAlign;
 import org.hibernate.engine.jdbc.StreamUtils;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,99 +80,69 @@ public class RpoomArrangementService {
 
 	public byte[] getSeatChartArrangementReport(HttpServletResponse response, ReportRoomDTO reportRoomDTO,
 			RoomAndInvigilatorDetail invDetails) throws IOException, ParseException {
-
-		String file = this.getClass().getResource("/static/Seat_Chart_Template.xlsx").getFile();
+		String file = this.getClass().getResource("/static/Seat_Chart_Template.docx").getFile();
 		InputStream input = new FileInputStream(file);
-		Workbook document = new XSSFWorkbook(input);
-		Sheet sheet = document.getSheetAt(0);
+
+		XWPFDocument document = new XWPFDocument(input);
+		List<XWPFTable> tables = document.getTables();
 
 		List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
+		int lastRowIndex = rollNumberList.stream().max(Comparator.comparing(List::size)).get().size();
 
-		// CellStyle cellStyle = sheet.getRow(1).getCell(0).getCellStyle();
+		XWPFTable contentTable = tables.get(0);
+		XWPFTableRow prevRow = contentTable.getRow(1);
+		XWPFTableCell prevRowCell = prevRow.getCell(1);
 
-		boolean headerRowPrintStatus = true;
-		Row headerRow = sheet.createRow(1);
-		Cell slTextCell = headerRow.createCell(0);
-		slTextCell.setCellValue("Sl.No.");
-		int lastRowIndex = rollNumberList.stream().max(Comparator.comparing(List::size)).get().size() + 2;
+		for (XWPFTableRow sRow : contentTable.getRows()) {
+			for (XWPFTableCell cell : sRow.getTableCells()) {
+				cell.setVerticalAlignment(XWPFVertAlign.CENTER);
+				cell.getParagraphs().get(0).setAlignment(ParagraphAlignment.CENTER);
+			}
+		}
+
+		for (int rI = 0; rI < lastRowIndex - 20; rI++) {
+			XWPFTableRow createRow = contentTable.createRow();
+
+			createRow.setHeight(prevRow.getHeight());
+
+			for (XWPFTableCell cell : createRow.getTableCells()) {
+				CTTc ctTc = cell.getCTTc();
+				ctTc.addNewTcPr().addNewTcBorders();
+
+				ctTc.getTcPr().setTcBorders(prevRowCell.getCTTc().getTcPr().getTcBorders());
+				cell.getParagraphs().get(0).setAlignment(ParagraphAlignment.CENTER);
+				cell.setVerticalAlignment(XWPFVertAlign.CENTER);
+
+			}
+		}
+		int serialNo = 1;
+		for (int i = 1; i <= lastRowIndex; i++) {
+			XWPFTableCell cell = contentTable.getRow(i).getCell(0);
+			if (cell.getText() == null || cell.getText().isEmpty()) {
+				cell.setText(serialNo++ + "");
+			}
+		}
 		int headerColumnSize = rollNumberList.size();
 		for (int columnIndex = 1; columnIndex <= headerColumnSize; columnIndex++) {
-			Cell headerColumnCell = headerRow.createCell(columnIndex);
-			headerColumnCell.setCellValue("Row" + columnIndex);
 			List<String> oneRowData = rollNumberList.get(columnIndex - 1);
-			for (int rowIndex = 2; rowIndex <= oneRowData.size() + 1; rowIndex++) {
-				Row row = sheet.getRow(rowIndex);
-				if (row == null) {
-					row = sheet.createRow(rowIndex);
+
+			for (int rowIndex = 0; rowIndex < oneRowData.size(); rowIndex++) {
+				XWPFTableRow contentRow = contentTable.getRow(rowIndex + 1);
+				XWPFTableCell cell = null;
+				if (contentRow != null) {
+					String value = oneRowData.get(rowIndex);
+					cell = contentRow.getCell(columnIndex);
+					cell.setText(value);
 				}
-				if (headerRowPrintStatus) {
-					Cell slCell = row.createCell(0);
-					slCell.setCellValue(rowIndex - 1);
-				}
-				Cell cell = row.createCell(columnIndex);
-				String value = oneRowData.get(rowIndex - 2);
-				cell.setCellValue(value);
 			}
-			headerRowPrintStatus = false;
-		}
-		if (headerColumnSize < 6) {
-			for (int hi = headerColumnSize + 1; hi <= 6; hi++) {
-				Cell blankCell = headerRow.createCell(hi);
-				blankCell.setCellValue("Row" + hi);
-			}
-		}
-		int breakRowIndex = lastRowIndex;
-		List<InvesilotersDTO> invesiloters = invDetails.getInvesiloters();
-		Row invRow = sheet.createRow(lastRowIndex++);
-		Cell invCell = invRow.createCell(0);
-		invCell.setCellValue("INVIGILATORS");
-		ExcelUtil.mergeCell(sheet, lastRowIndex - 1, lastRowIndex - 1, 0, 1);
-		if (invesiloters == null) {
-			invesiloters = new ArrayList<>();
-		}
-		int resultCellRowIndex = lastRowIndex;
-		for (InvesilotersDTO inv : invesiloters) {
-			invRow = sheet.createRow(lastRowIndex++);
-			invCell = invRow.createCell(0);
-			invRow.createCell(1);
-			invCell.setCellValue(inv.getName());
-			ExcelUtil.mergeCell(sheet, lastRowIndex - 1, lastRowIndex - 1, 0, 1);
 		}
 
-		lastRowIndex = resultCellRowIndex;
-		List<String> textList = Arrays.asList("REGULAR", "TOTAL");
-		for (int i = 0; i < 2; i++) {
-			invRow = sheet.getRow(lastRowIndex++);
-			if (invRow == null) {
-				lastRowIndex = lastRowIndex - 1;
-				invRow = sheet.createRow(lastRowIndex++);
-			}
-			invCell = invRow.createCell(2);
-			invCell.setCellValue(textList.get(i));
-			invRow.createCell(3);
-			ExcelUtil.mergeCell(sheet, lastRowIndex - 1, lastRowIndex - 1, 2, 3);
-		}
-
-		lastRowIndex = resultCellRowIndex;
-		textList = Arrays.asList("TOTAL", "PRESENT", "ABSENT");
-		for (int i = 0; i < 3; i++) {
-			invRow = sheet.getRow(lastRowIndex++);
-			if (invRow == null) {
-				lastRowIndex = lastRowIndex - 1;
-				invRow = sheet.createRow(lastRowIndex++);
-			}
-			invCell = invRow.createCell(4);
-			invCell.setCellValue(textList.get(i));
-			invRow.createCell(5);
-			ExcelUtil.mergeCell(sheet, lastRowIndex - 1, lastRowIndex - 1, 4, 5);
-		}
-		ExcelUtil.setCellBorder(document, sheet, breakRowIndex);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		document.write(out);
 		document.close();
 		out.close();
-		byte[] responseByteArray = out.toByteArray();
-		return responseByteArray;
+
+		return out.toByteArray();
 	}
 
 	public byte[] getRoomArrangementReport(HttpServletResponse response, ReportDTO dto, ZipOutputStream zipOut)
