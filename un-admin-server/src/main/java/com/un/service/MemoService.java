@@ -1,6 +1,7 @@
 package com.un.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,7 @@ public class MemoService {
 			MemoDTO memoDTO = new MemoDTO();
 			memoDTO.setId(m.getId());
 			memoDTO.setName(m.getName());
+			memoDTO.setCreaatedDate(m.getCreatedDate());
 			try {
 				ReportDTO reportDTO = objectMapper.readValue(m.getMemoDetails(), ReportDTO.class);
 				reportDTO = filterReportDTO(reportDTO);
@@ -58,6 +60,10 @@ public class MemoService {
 				e.printStackTrace();
 			}
 		});
+		try {
+			dtos.sort(Comparator.comparing(MemoDTO::getCreaatedDate).reversed());
+		} catch (Exception e) {
+		}
 		return dtos;
 	}
 

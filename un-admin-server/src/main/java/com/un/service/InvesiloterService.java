@@ -1,6 +1,8 @@
 package com.un.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,7 +80,11 @@ public class InvesiloterService {
 		int totalRoomToAlert = mapOfRooms.keySet().size() - 1;
 
 		List<InvesilotersDTO> allInvesticators = invesiloterData.get(0).getInvesiloters();
-		allInvesticators.sort(Comparator.comparing(InvesilotersDTO::getDepartment).thenComparing(InvesilotersDTO::getName));
+		allInvesticators
+				.sort(Comparator.comparing(InvesilotersDTO::getDepartment).thenComparing(InvesilotersDTO::getName));
+		
+		Collections.shuffle(allInvesticators);
+		
 		if (totalRoomToAlert > allInvesticators.size()) {
 			return null;
 		}
@@ -148,13 +154,316 @@ public class InvesiloterService {
 					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
 				}
 			}
+		} else if (invesiloterSize == 5) {
+			int i = 0;
+			for (String key : mapOfRooms.keySet()) {
+				setInvesiloterToRoom(mapOfRooms, allInvesticators, i, key);
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+		} else if (invesiloterSize == 6) {
+			int i = 0;
+			for (String key : mapOfRooms.keySet()) {
+				setInvesiloterToRoom(mapOfRooms, allInvesticators, i, key);
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+		} else if (invesiloterSize == 7) {
+			int i = 0;
+			for (String key : mapOfRooms.keySet()) {
+				setInvesiloterToRoom(mapOfRooms, allInvesticators, i, key);
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+		} else if (invesiloterSize == 8) {
+			int i = 0;
+			for (String key : mapOfRooms.keySet()) {
+				setInvesiloterToRoom(mapOfRooms, allInvesticators, i, key);
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+		} else if (invesiloterSize == 9) {
+			int i = 0;
+			for (String key : mapOfRooms.keySet()) {
+				setInvesiloterToRoom(mapOfRooms, allInvesticators, i, key);
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+		} else if (invesiloterSize == 10) {
+			int i = 0;
+			for (String key : mapOfRooms.keySet()) {
+				setInvesiloterToRoom(mapOfRooms, allInvesticators, i, key);
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
+			for (String key : mapOfRooms.keySet()) {
+				if ("Invesiloters".equals(key)) {
+					continue;
+				} else {
+					setInvesiloterToAlredyPresentList(mapOfRooms, allInvesticators, i, key);
+				}
+			}
 		}
 		return dto;
 	}
 
 	private void setInvesiloterToAlredyPresentList(Map<String, List<AlertRoom>> mapOfRooms,
 			List<InvesilotersDTO> allInvesticators, int i, String key) {
-		if("Invesiloters".equals(key) || allInvesticators.isEmpty()) {
+		if ("Invesiloters".equals(key) || allInvesticators.isEmpty()) {
 			return;
 		}
 		AlertRoom room = mapOfRooms.get(key).get(0);

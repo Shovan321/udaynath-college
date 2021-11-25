@@ -1,6 +1,7 @@
 package com.un.web;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.un.dto.AlertRoom;
 import com.un.dto.InvesilotersDTO;
 import com.un.dto.RoomInveiloterDTO;
 import com.un.service.InvesiloterService;
@@ -31,6 +33,13 @@ public class InvesiloterResource {
 	
 	@PostMapping(value = "/manage-invesiloter")
 	public RoomInveiloterDTO mappingRoomAndInvesiloter(@RequestBody RoomInveiloterDTO dto) {
-		return service.mappingRoomAndInvesiloter(dto);
+		RoomInveiloterDTO mappingRoomAndInvesiloter = service.mappingRoomAndInvesiloter(dto);
+		
+		List<AlertRoom> alertsRooms = mappingRoomAndInvesiloter.getAlertsRooms();
+		for (AlertRoom alertRoom : alertsRooms) {
+			List<InvesilotersDTO> invesiloters = alertRoom.getInvesiloters();
+			invesiloters.sort(Comparator.comparing(InvesilotersDTO::getDepartment));
+		}
+		return mappingRoomAndInvesiloter;
 	}
 }

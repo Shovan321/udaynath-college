@@ -84,6 +84,11 @@ public class RpoomArrangementService {
 		InputStream input = new FileInputStream(file);
 
 		XWPFDocument document = new XWPFDocument(input);
+		List<XWPFParagraph> paragraphs = document.getParagraphs();
+		int in = 0;
+		for (XWPFParagraph p : paragraphs) {
+			System.out.println(p.getText() + " ====> " + (++in));
+		}
 		List<XWPFTable> tables = document.getTables();
 
 		List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
