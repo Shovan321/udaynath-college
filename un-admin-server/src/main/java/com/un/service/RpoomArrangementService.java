@@ -137,6 +137,12 @@ public class RpoomArrangementService {
 				if (contentRow != null) {
 					String value = oneRowData.get(rowIndex);
 					cell = contentRow.getCell(columnIndex);
+					if(cell == null) {
+						cell = contentRow.createCell();
+					}
+					if(value == null) {
+						value = "";
+					}
 					cell.setText(value);
 				}
 			}
@@ -221,6 +227,53 @@ public class RpoomArrangementService {
 		document.close();
 		byte[] responseByteArray = out.toByteArray();
 		ZipEntry zipEntry = new ZipEntry("Room Arrangement" + ".docx");
+		zipEntry.setSize(responseByteArray.length);
+		zipOut.putNextEntry(zipEntry);
+
+		InputStream inputStream = new ByteArrayInputStream(responseByteArray);
+		StreamUtils.copy(inputStream, zipOut);
+		zipOut.closeEntry();
+		return responseByteArray;
+	}
+
+	public byte[] getDutyLitReport(HttpServletResponse response, ReportDTO dto, ZipOutputStream zipOut)
+			throws IOException {
+
+		XWPFDocument document = new XWPFDocument();
+
+		XWPFTable table = document.createTable();
+		table.setWidth("100.00%");
+		XWPFTableRow row = table.getRow(0); // First row
+		// Columns
+		row.getCell(0).setText("Sl. No.");
+		row.addNewTableCell().setText("ROOM NO");
+		row.addNewTableCell().setText("NAME");
+
+		List<RoomAndInvigilatorDetail> selectedRoomsForInvesiloter = dto.getSelectedRoomsForInvesiloter();
+		
+		int rowIndex = 1;
+		for(RoomAndInvigilatorDetail detail : selectedRoomsForInvesiloter) {
+			if("Invesiloters".equalsIgnoreCase(detail.getId())) {
+				continue;
+			}
+			List<InvesilotersDTO> invesiloters = detail.getInvesiloters();
+			if(invesiloters != null && !invesiloters.isEmpty()) {
+				for(InvesilotersDTO inv : invesiloters) {
+					XWPFTableRow newRow = table.createRow();
+					newRow.getCell(0).setText((rowIndex) + "");
+					newRow.getCell(1).setText(detail.getId());
+					newRow.getCell(2).setText(inv.getName());
+					rowIndex++;
+				}
+			}
+		}
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		document.write(out);
+		out.close();
+		document.close();
+		byte[] responseByteArray = out.toByteArray();
+		ZipEntry zipEntry = new ZipEntry("Duty-List" + ".docx");
 		zipEntry.setSize(responseByteArray.length);
 		zipOut.putNextEntry(zipEntry);
 

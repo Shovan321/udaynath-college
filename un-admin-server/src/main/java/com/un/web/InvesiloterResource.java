@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,8 @@ import com.un.dto.InvesilotersDTO;
 import com.un.dto.RoomInveiloterDTO;
 import com.un.service.InvesiloterService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping(value = "/api/invesiloters")
 public class InvesiloterResource {
@@ -25,7 +29,8 @@ public class InvesiloterResource {
 	@Autowired
 	private InvesiloterService service ; 
 	@PostMapping
-	public List<InvesilotersDTO> processStudent(@RequestParam(value = "file", required = true) MultipartFile file) throws IOException {
+	public List<InvesilotersDTO> processStudent(HttpServletRequest request,@RequestParam(value = "file", required = true) MultipartFile file) throws IOException {
+		//log.info(request.getRemoteAddr());
 		XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
 		List<InvesilotersDTO> processStudentFile = service.processStudentFile(workbook);
 		return processStudentFile;

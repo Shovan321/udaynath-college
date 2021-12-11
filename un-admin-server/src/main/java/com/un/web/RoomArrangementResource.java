@@ -39,6 +39,7 @@ public class RoomArrangementResource {
 		ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream());
 
 		service.getRoomArrangementReport(response, dto, zipOut);
+		service.getDutyLitReport(response, dto, zipOut);
 		
 		List<ReportRoomDTO> selectedRooms = dto.getSelectedRooms();
 		List<RoomAndInvigilatorDetail> selectedRoomsForInvesiloter = dto.getSelectedRoomsForInvesiloter();

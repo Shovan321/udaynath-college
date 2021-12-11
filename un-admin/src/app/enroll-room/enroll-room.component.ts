@@ -128,7 +128,33 @@ export class EnrollRoomComponent implements OnInit {
         }
       }
     } else if (studentMapValue.length == 2) {
-      let studentIndex = 0;
+      this.forMultiRow(studentMapValue);
+      
+    } else {
+
+      let studentValue = [];
+      for(let rIndex = 0 ; rIndex < studentMapValue.length; rIndex++) {
+        for(let data of studentMapValue[rIndex]) {
+          studentValue.push(data);
+        }
+      }
+     
+      let newStudentMapValue = [];
+      newStudentMapValue[0] = [];
+      newStudentMapValue[1] = [];
+      let half = Math.round(studentValue.length / 2);
+      for(let i = 0 ; i < half; i++){
+        newStudentMapValue[0].push(studentValue[i]);
+      }
+      for(let i = half; i < studentValue.length; i++){
+        newStudentMapValue[1].push(studentValue[i]);
+      }
+      this.forMultiRow(newStudentMapValue);
+    }
+  }
+
+  forMultiRow(studentMapValue) {
+    let studentIndex = 0;
       let secondeStudentIndex = 0;
       for (let room of this.selectedRooms) {
         room.rollNumberList = [];
@@ -157,75 +183,6 @@ export class EnrollRoomComponent implements OnInit {
           room.rollNumberList.push(columnValue);
         }
       }
-    } else if (studentMapValue.length == 3) {
-      let studentIndex = 0;
-      let secondStudentIndex = 0;
-      let firstSheetValueLength = studentMapValue[0].length;
-      let secondSheetValueLength = studentMapValue[1].length;
-      let thirdSheetValueLength = studentMapValue[2].length;
-      let firstColumnCellValue = [];
-      let secondColumnCellValue = [];
-      if (firstSheetValueLength >= secondSheetValueLength + thirdSheetValueLength) {
-        firstColumnCellValue = studentMapValue[0];
-        secondColumnCellValue = studentMapValue[1];
-        for (let ele of studentMapValue[2]) {
-          secondColumnCellValue.push(ele);
-        }
-
-      } else if (secondSheetValueLength >= firstSheetValueLength + thirdSheetValueLength) {
-        firstColumnCellValue = studentMapValue[1];
-        secondColumnCellValue = studentMapValue[0];
-        for (let ele of studentMapValue[2]) {
-          secondColumnCellValue.push(ele);
-        }
-
-      } else if (thirdSheetValueLength >= firstSheetValueLength + secondSheetValueLength) {
-        firstColumnCellValue = studentMapValue[2];
-        secondColumnCellValue = studentMapValue[0];
-        for (let ele of studentMapValue[1]) {
-          secondColumnCellValue.push(ele);
-        }
-      } else {
-        firstColumnCellValue = studentMapValue[0];
-
-        for (let ele of studentMapValue[1]) {
-          firstColumnCellValue.push(ele);
-        }
-
-        for (let ele of studentMapValue[2]) {
-          secondColumnCellValue.push(ele);
-        }
-      }
-
-      for (let room of this.selectedRooms) {
-        room.rollNumberList = [];
-        let rowCapacity = room.rowCapacity;
-        let noOfRow = room.noOfRow;
-
-        for (let columnIndex = 0; columnIndex < rowCapacity; columnIndex++) {
-          let columnValue = [];
-          for (let rowNumber = 0; rowNumber < noOfRow; rowNumber++) {
-            if (columnIndex % 2 == 0) {
-              if (firstColumnCellValue.length >= studentIndex && firstColumnCellValue[studentIndex]) {
-                columnValue.push(firstColumnCellValue[studentIndex].roolNumber);
-                studentIndex++;
-              } else {
-                continue;
-              }
-            } else {
-              if (secondColumnCellValue.length >= secondStudentIndex && secondColumnCellValue[secondStudentIndex]) {
-                columnValue.push(secondColumnCellValue[secondStudentIndex].roolNumber);
-                secondStudentIndex++;
-              } else {
-                continue;
-              }
-            }
-          }
-          room.rollNumberList.push(columnValue);
-        }
-      }
-
-    }
   }
   alloctaedSeatCount = 0;
   uploadedSTudentCounts = 0;
