@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 .screen-css{
-    padding-top: 15px
+    padding-top: 15px;
+    min-height: 80vh;
 }
 .ml-10{
     margin-left: 10px;

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.IntSummaryStatistics;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
 import org.apache.poi.xwpf.usermodel.ICell;
+import org.apache.poi.xwpf.usermodel.IRunElement;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFHeader;
@@ -85,10 +87,33 @@ public class RpoomArrangementService {
 
 		XWPFDocument document = new XWPFDocument(input);
 		List<XWPFParagraph> paragraphs = document.getParagraphs();
-		int in = 0;
-		for (XWPFParagraph p : paragraphs) {
-			System.out.println(p.getText() + " ====> " + (++in));
+		List<Integer> invListOfParagraph = new ArrayList<>();
+		invListOfParagraph.add(8);
+		invListOfParagraph.add(14);
+		invListOfParagraph.add(16);
+		invListOfParagraph.add(17);
+		invListOfParagraph.add(18);
+		int invIndex = 0;
+		List<InvesilotersDTO> invesiloters = invDetails.getInvesiloters();
+		for(Integer key : invListOfParagraph) {
+			try {
+				XWPFParagraph xwpfParagraph = paragraphs.get(key);
+				XWPFRun iRunElement = (XWPFRun)xwpfParagraph.getIRuns().get(0);
+				InvesilotersDTO invesilotersDTO = invesiloters.get(invIndex);
+				String name = invesilotersDTO.getName();
+				if(name != null) {
+					iRunElement.setText(" "+name);
+					invIndex++;				
+				}
+			} catch (Exception e) {
+			}
 		}
+		
+		/*
+		 * for (XWPFParagraph p : paragraphs) { List<IRunElement> iRuns = p.getIRuns();
+		 * System.out.println(p.getText() + " ====> " + (in) +"======> " + iRuns); in++;
+		 * }
+		 */
 		List<XWPFTable> tables = document.getTables();
 
 		List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();

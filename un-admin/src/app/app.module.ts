@@ -26,6 +26,7 @@ import { MemoComponent } from './memo/memo.component';
 import {DividerModule} from 'primeng/divider';
 import { HomeComponent } from './home/home.component';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { FooterComponent } from './footer/footer.component';
 
 const modules = [
   BrowserModule,
@@ -54,7 +55,8 @@ const modules = [
     AssignRoomComponent,
     EnrollRoomComponent,
     MemoComponent,
-    HomeComponent
+    HomeComponent,
+    FooterComponent
   ],
   imports: [
     modules
