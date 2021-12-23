@@ -12,8 +12,12 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellCopyPolicy;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -39,21 +43,35 @@ public class SignetureSheetService {
 	public String sheetName;
 
 	public synchronized void generateSignetureSheet(ReportRoomDTO reportRoomDTO, String prefix,
-			List<RollNumberForSeatArrangement> rollPerRoom, ZipOutputStream zipOut) {
+			List<RollNumberForSeatArrangement> rollPerRoom, ZipOutputStream zipOut, String examName, String date) {
 		try {
 
 			String file = this.getClass().getResource("/static/signature_sheet.xlsx").getFile();
 			InputStream input = new FileInputStream(file);
 			Workbook document = new XSSFWorkbook(input);
 			Sheet outputSheet = document.getSheet(sheetName);
-
+			CellStyle cellStyle = getStyle(document);
+	        
+			Cell fCell = outputSheet.getRow(0).getCell(0);
+			RichTextString richStringCellValue = fCell.getRichStringCellValue();
+			//richStringCellValue.
+			String stringCellValue = fCell.getStringCellValue();
+			stringCellValue = stringCellValue.replace("S- 26", reportRoomDTO.getName());
+			stringCellValue = stringCellValue.replace("3RD SEMESTER EXAMINATIONS -2021", examName);
+			stringCellValue = stringCellValue.replace("20.04.2021", date);
+			
+			fCell.setCellValue(stringCellValue);
 			int rowNmber = 3;
 			for (RollNumberForSeatArrangement roll : rollPerRoom) {
 				int cellNumber = 0;
 				Row signetureRow = outputSheet.createRow(rowNmber++);
 				Cell cell = signetureRow.createCell(cellNumber++);
+				cell.setCellStyle(cellStyle);
 				String rollNumber = getDataWithPrefix(roll.getRollNumber());
-				
+				for(int i = 1; i< 5; i++) {
+					Cell bcell = signetureRow.createCell(i);
+					bcell.setCellStyle(cellStyle);
+				}
 				cell.setCellValue(roll.getPrefix() + rollNumber);
 			}
 
@@ -61,7 +79,7 @@ public class SignetureSheetService {
 			document.write(out);
 			byte[] responseByteArray = out.toByteArray();
 			String name = reportRoomDTO.getName();
-			ZipEntry zipEntry = new ZipEntry((prefix + " " + name + " - Sigeture sheet").toUpperCase() + ".xlsx");
+			ZipEntry zipEntry = new ZipEntry((prefix + " " + name + " - Signature sheet").toUpperCase() + ".xlsx");
 			zipEntry.setSize(responseByteArray.length);
 			zipOut.putNextEntry(zipEntry);
 			out.close();
@@ -72,6 +90,19 @@ public class SignetureSheetService {
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
+	}
+	private CellStyle getStyle(Workbook document) {
+		CellStyle cellStyle = document.createCellStyle();
+		
+		cellStyle.setBorderBottom(BorderStyle.THIN);
+		cellStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+		cellStyle.setBorderLeft(BorderStyle.THIN);
+		cellStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+		cellStyle.setBorderRight(BorderStyle.THIN);
+		cellStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+		cellStyle.setBorderTop(BorderStyle.THIN);
+		cellStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
+		return cellStyle;
 	}
 	String getDataWithPrefix(int number) {
 		if (number <= 9) {

@@ -24,6 +24,8 @@ export class EnrollRoomComponent implements OnInit {
   rooms: Room[] = [];
   students = new StudentResponseDTO();
   titleOfExam = '';
+  nameOfExam = '';
+  dateOfExam ='';
   invesiloterSize = 0;
   constructor(private departmentsService: DepartmentService,
     private roomService: RoomService,
@@ -41,6 +43,8 @@ export class EnrollRoomComponent implements OnInit {
     this.selectedRooms = [];
     this.invesiloterSize = 0;
     this.titleOfExam = '';
+    this.nameOfExam = '';
+    this.dateOfExam = '';
     this.students = new StudentResponseDTO();
     this.departmentsService.getAll().subscribe(res => {
       this.departments = res['data'];
@@ -164,7 +168,7 @@ export class EnrollRoomComponent implements OnInit {
         for (let columnIndex = 0; columnIndex < rowCapacity; columnIndex++) {
           let columnValue = [];
           for (let rowNumber = 0; rowNumber < noOfRow; rowNumber++) {
-            if (columnIndex % 2 !== 0) {
+            if (columnIndex % 2 == 0) {
               if (studentMapValue[0].length >= studentIndex && studentMapValue[0][studentIndex]) {
                 columnValue.push(studentMapValue[0][studentIndex].roolNumber);
                 studentIndex++;
@@ -220,7 +224,9 @@ export class EnrollRoomComponent implements OnInit {
   }
   exportStudentRoomAlwrtment() {
     let body = {
+      'dateOfExam':this.dateOfExam,
       'title': this.titleOfExam,
+      'examName': this.nameOfExam,
       'selectedRooms': this.selectedRooms,
       'selectedRoomsForInvesiloter': this.selectedRoomsForInvesiloter
     }

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -37,6 +39,10 @@ public class RoomArrangementResource {
 	public void downloadRoomArrangementDetails(HttpServletResponse response, @RequestBody ReportDTO dto)
 			throws IOException, ParseException {
 		ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream());
+		String[] split = dto.getDateOfExam().split("-");
+		List<String> collect = Stream.of(split).map(d -> d.trim()).collect(Collectors.toList());
+		String date = collect.get(2) + "." + collect.get(1) + "." + collect.get(0);
+		dto.setDateOfExam(date);
 
 		service.getRoomArrangementReport(response, dto, zipOut);
 		service.getDutyLitReport(response, dto, zipOut);
@@ -52,8 +58,12 @@ public class RoomArrangementResource {
 					.filter(r -> r.getId().equals(reportRoomDTO.getName())).findAny()
 					.orElse(new RoomAndInvigilatorDetail());
 			reportRoomDTO.setTitle(dto.getTitle().toUpperCase());
-			byte[] roomArrangementReport = service.getSeatChartArrangementReport(response, reportRoomDTO, invDetails);
-
+			byte[] roomArrangementReport = service.getSeatChartArrangementReport(response, reportRoomDTO,
+					invDetails, dto.getExamName(), dto.getDateOfExam());
+			
+			if(roomArrangementReport == null) {
+				continue;
+			}
 			String name = reportRoomDTO.getName();
 			ZipEntry zipEntry = new ZipEntry(name + "- Seat Chart" + ".docx");
 			zipEntry.setSize(roomArrangementReport.length);

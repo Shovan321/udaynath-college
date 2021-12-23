@@ -7,26 +7,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.IntSummaryStatistics;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
-import org.apache.poi.xwpf.usermodel.ICell;
 import org.apache.poi.xwpf.usermodel.IRunElement;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -47,7 +40,7 @@ import com.un.dto.ReportDTO;
 import com.un.dto.ReportRoomDTO;
 import com.un.dto.RollNumberForSeatArrangement;
 import com.un.dto.RoomAndInvigilatorDetail;
-import com.un.util.ExcelUtil;
+import com.un.util.DocsUtil;
 import com.un.util.UNContsant;
 
 @Service
@@ -81,7 +74,18 @@ public class RpoomArrangementService {
 	}
 
 	public byte[] getSeatChartArrangementReport(HttpServletResponse response, ReportRoomDTO reportRoomDTO,
-			RoomAndInvigilatorDetail invDetails) throws IOException, ParseException {
+			RoomAndInvigilatorDetail invDetails, String examName, String date)
+			throws IOException, ParseException {
+
+		List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
+		if (rollNumberList == null || rollNumberList.isEmpty()) {
+			return null;
+		}
+		long count = rollNumberList.stream().filter(d -> d != null).flatMap(d -> d.stream())
+				.filter(d -> d != null && !d.isEmpty()).count();
+		if (count == 0l) {
+			return null;
+		}
 		String file = this.getClass().getResource("/static/Seat_Chart_Template.docx").getFile();
 		InputStream input = new FileInputStream(file);
 
@@ -95,28 +99,35 @@ public class RpoomArrangementService {
 		invListOfParagraph.add(18);
 		int invIndex = 0;
 		List<InvesilotersDTO> invesiloters = invDetails.getInvesiloters();
-		for(Integer key : invListOfParagraph) {
+		for (Integer key : invListOfParagraph) {
 			try {
 				XWPFParagraph xwpfParagraph = paragraphs.get(key);
-				XWPFRun iRunElement = (XWPFRun)xwpfParagraph.getIRuns().get(0);
+				XWPFRun iRunElement = (XWPFRun) xwpfParagraph.getIRuns().get(0);
 				InvesilotersDTO invesilotersDTO = invesiloters.get(invIndex);
 				String name = invesilotersDTO.getName();
-				if(name != null) {
-					iRunElement.setText(" "+name);
-					invIndex++;				
+				if (name != null) {
+					iRunElement.setText(" " + name);
+					invIndex++;
 				}
 			} catch (Exception e) {
 			}
 		}
-		
+
 		/*
-		 * for (XWPFParagraph p : paragraphs) { List<IRunElement> iRuns = p.getIRuns();
-		 * System.out.println(p.getText() + " ====> " + (in) +"======> " + iRuns); in++;
-		 * }
+		 * int in = 0; for (XWPFParagraph p : paragraphs) { List<IRunElement> iRuns =
+		 * p.getIRuns(); System.out.println(p.getText() + " ====> " + (in) + "======> "
+		 * + iRuns); in++; }
 		 */
+
+		try {
+			DocsUtil.replaceParagraph(paragraphs.get(2), "EXAMNAMEWILLREPLACE", examName);
+			DocsUtil.replaceParagraph(paragraphs.get(3), "ROOMNAMEREPLACE", reportRoomDTO.getName());
+			DocsUtil.replaceParagraph(paragraphs.get(4), "22.04.2021", date);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		List<XWPFTable> tables = document.getTables();
 
-		List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
 		int lastRowIndex = rollNumberList.stream().max(Comparator.comparing(List::size)).get().size();
 
 		XWPFTable contentTable = tables.get(0);
@@ -162,10 +173,10 @@ public class RpoomArrangementService {
 				if (contentRow != null) {
 					String value = oneRowData.get(rowIndex);
 					cell = contentRow.getCell(columnIndex);
-					if(cell == null) {
+					if (cell == null) {
 						cell = contentRow.createCell();
 					}
-					if(value == null) {
+					if (value == null) {
 						value = "";
 					}
 					cell.setText(value);
@@ -202,7 +213,7 @@ public class RpoomArrangementService {
 		int rowIndex = 1;
 		for (ReportRoomDTO reportRoomDTO : selectedRooms) {
 			if (firstTime) {
-				reportRoomDTO.setTitle(dto.getTitle().toUpperCase());
+				reportRoomDTO.setTitle(dto.getExamName().toUpperCase());
 				XWPFHeaderFooterPolicy policy = document.createHeaderFooterPolicy();
 				if (policy.getDefaultHeader() == null && policy.getFirstPageHeader() == null
 						&& policy.getDefaultFooter() == null) {
@@ -242,7 +253,8 @@ public class RpoomArrangementService {
 				int min = collect.getMin();
 				String name = reportRoomDTO.getName();
 				rowIndex = getStudentDetailsReportTable(table, rowIndex, max, min, prefix, name, document);
-				signetureSheetService.generateSignetureSheet(reportRoomDTO, prefix, rollPerRoom, zipOut);
+				signetureSheetService.generateSignetureSheet(reportRoomDTO, prefix, rollPerRoom, zipOut,
+						dto.getExamName(), dto.getDateOfExam());
 			}
 		}
 
@@ -275,15 +287,15 @@ public class RpoomArrangementService {
 		row.addNewTableCell().setText("NAME");
 
 		List<RoomAndInvigilatorDetail> selectedRoomsForInvesiloter = dto.getSelectedRoomsForInvesiloter();
-		
+
 		int rowIndex = 1;
-		for(RoomAndInvigilatorDetail detail : selectedRoomsForInvesiloter) {
-			if("Invesiloters".equalsIgnoreCase(detail.getId())) {
+		for (RoomAndInvigilatorDetail detail : selectedRoomsForInvesiloter) {
+			if ("Invesiloters".equalsIgnoreCase(detail.getId())) {
 				continue;
 			}
 			List<InvesilotersDTO> invesiloters = detail.getInvesiloters();
-			if(invesiloters != null && !invesiloters.isEmpty()) {
-				for(InvesilotersDTO inv : invesiloters) {
+			if (invesiloters != null && !invesiloters.isEmpty()) {
+				for (InvesilotersDTO inv : invesiloters) {
 					XWPFTableRow newRow = table.createRow();
 					newRow.getCell(0).setText((rowIndex) + "");
 					newRow.getCell(1).setText(detail.getId());
@@ -292,7 +304,7 @@ public class RpoomArrangementService {
 				}
 			}
 		}
-		
+
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		document.write(out);
 		out.close();
