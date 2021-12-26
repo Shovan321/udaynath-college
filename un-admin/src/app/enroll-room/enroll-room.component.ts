@@ -276,7 +276,8 @@ export class EnrollRoomComponent implements OnInit {
           let currentDetials = {
             id: room.name,
             invesiloters: [
-            ]
+            ],
+            studentCount: studentCount
           }
           this.selectedRoomsForInvesiloter.push(currentDetials);
         }
@@ -316,5 +317,13 @@ export class EnrollRoomComponent implements OnInit {
         });
       }
     });
+  }
+  getMispell(roomId){
+    let id = roomId.id;
+    if("Invesiloters" == id){
+      return "Invigilator";
+    } else {
+      return id + "("+ roomId.studentCount + ")";
+    }
   }
 }

@@ -145,7 +145,7 @@
                     <div class="row" style="margin-top: 5px;">
                         <div class="col-md-3" *ngFor="let room of selectedRoomsForInvesiloter">
                             <div class="drag-container">
-                                <div class="section-heading">{{room.id}}
+                                <div class="section-heading">{{getMispell(room)}}
                                     <span *ngIf="'Invesiloters' === room.id" class="shift-icon"
                                         (click)='autoAssignInvesiloter()'>
 

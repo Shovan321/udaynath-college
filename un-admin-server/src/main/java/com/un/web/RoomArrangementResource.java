@@ -77,7 +77,7 @@ public class RoomArrangementResource {
 		zipOut.finish();
 		zipOut.close();
 		response.setStatus(HttpServletResponse.SC_OK);
-		String zipFileName = "room-memo.zip";
+		String zipFileName = dto.getTitle() +".zip";
 		response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "*");
 		response.addHeader("file-name", zipFileName);
 		response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipFileName + "\"");

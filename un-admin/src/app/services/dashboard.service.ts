@@ -25,7 +25,7 @@ export class DashboardService {
       var link = document.createElement('a');
       const data = window.URL.createObjectURL(newBlob);
       link.setAttribute("href", data);
-      link.download = "room-memo.zip"
+      link.download = body.title + ".zip"
 
       document.body.appendChild(link);
       link.click();

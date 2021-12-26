@@ -16,20 +16,17 @@ import com.un.dto.StudentResponseDTO;
 public class StudentService {
 
 	public StudentResponseDTO processStudentFile(XSSFWorkbook workbook) {
-
 		StudentResponseDTO dto = new StudentResponseDTO();
 		List<List<Student>> studentsList = new LinkedList<>();
 		List<String> studentNameList = new LinkedList<>();
 		for (Sheet sheet : workbook) {
 			List<Student> students = new LinkedList<>();
-			boolean headerstatus = true;
 			for (Row row : sheet) {
-				if (headerstatus) {
-					headerstatus = false;
-					continue;
-				}
 				Cell roolNumberCell = row.getCell(0);
 				String rollNumber = getValue(roolNumberCell);
+				if(rollNumber != null && rollNumber.isEmpty()) {
+					continue;
+				}
 				Cell nameCell = row.getCell(1);
 				String name = getValue(nameCell);
 				Student s = new Student();
