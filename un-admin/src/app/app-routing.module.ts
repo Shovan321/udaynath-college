@@ -28,6 +28,9 @@ const routes: Routes = [
   }, {
     path: 'memo',
     component: MemoComponent
+  },{
+    path:'**',
+    redirectTo: '/home'
   }
 ];
 

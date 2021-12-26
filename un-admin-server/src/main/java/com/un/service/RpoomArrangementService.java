@@ -48,15 +48,16 @@ public class RpoomArrangementService {
 
 	@Autowired
 	SignetureSheetService signetureSheetService;
+	
 	String fontFamily = "Calibri";
 
-	private void createReportHeader(ReportRoomDTO reportRoomDTO, XWPFHeaderFooterPolicy policy) {
+	private void createReportHeader(ReportRoomDTO reportRoomDTO, XWPFHeaderFooterPolicy policy, String type) {
 		@SuppressWarnings("static-access")
 		XWPFHeader headerD = policy.createHeader(policy.DEFAULT);
 
 		setHeaderAndTitleText(headerD.createParagraph(), UNContsant.ROOM_ARRANGEMENT_HEADER, false);
 		setHeaderAndTitleText(headerD.createParagraph(), reportRoomDTO.getTitle(), false);
-		setHeaderAndTitleText(headerD.createParagraph(), UNContsant.ROOM_ARRANGEMENT_HEADER_2, false);
+		setHeaderAndTitleText(headerD.createParagraph(), type, false);
 		setHeaderAndTitleText(headerD.createParagraph(), "Date : DD/YY/MM", true);
 	}
 
@@ -218,7 +219,7 @@ public class RpoomArrangementService {
 				if (policy.getDefaultHeader() == null && policy.getFirstPageHeader() == null
 						&& policy.getDefaultFooter() == null) {
 
-					createReportHeader(reportRoomDTO, policy);
+					createReportHeader(reportRoomDTO, policy, UNContsant.ROOM_ARRANGEMENT_HEADER_2);
 				}
 				firstTime = false;
 			}
@@ -275,9 +276,19 @@ public class RpoomArrangementService {
 
 	public byte[] getDutyLitReport(HttpServletResponse response, ReportDTO dto, ZipOutputStream zipOut)
 			throws IOException {
-
+		List<ReportRoomDTO> selectedRooms = dto.getSelectedRooms();
+		if(selectedRooms == null || selectedRooms.isEmpty()) {
+			return null;
+		}
 		XWPFDocument document = new XWPFDocument();
-
+		XWPFHeaderFooterPolicy policy = document.createHeaderFooterPolicy();
+		if (policy.getDefaultHeader() == null && policy.getFirstPageHeader() == null
+				&& policy.getDefaultFooter() == null) {
+			ReportRoomDTO reportRoomDTO = selectedRooms.get(0);
+			reportRoomDTO.setTitle(dto.getExamName().toUpperCase());
+			createReportHeader(reportRoomDTO, policy, UNContsant.DUTY_LIST);
+		}
+		
 		XWPFTable table = document.createTable();
 		table.setWidth("100.00%");
 		XWPFTableRow row = table.getRow(0); // First row

@@ -3,10 +3,13 @@
 }
 .p-inputgroup{
     overflow:auto;
-    height: 90px;
+    /* height: 90px; */
 }
 .column-name-style{
     margin-top: 15px;
     font-size: 25px;
     font-weight: 600;
+}
+p-checkbox{
+    display: block;
 }

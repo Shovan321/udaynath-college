@@ -1,0 +1,22 @@
+.imgbg{
+    background-image: url("/assets/images/home.png");
+    height: calc(100vh - 130px);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+.login-form{
+    background: #00000082;
+    /* margin-top: 10px; */
+    padding: 15px;
+    border-radius: 8px;
+    width: 400px;
+}
+.allign-login-form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.form-group label{
+    color: #fff;
+}
