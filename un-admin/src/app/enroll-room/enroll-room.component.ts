@@ -26,6 +26,7 @@ export class EnrollRoomComponent implements OnInit {
   titleOfExam = '';
   nameOfExam = '';
   dateOfExam ='';
+  sittingOfExam='';
   invesiloterSize = 0;
   constructor(private departmentsService: DepartmentService,
     private roomService: RoomService,
@@ -45,6 +46,7 @@ export class EnrollRoomComponent implements OnInit {
     this.titleOfExam = '';
     this.nameOfExam = '';
     this.dateOfExam = '';
+    this.sittingOfExam = '';
     this.students = new StudentResponseDTO();
     this.departmentsService.getAll().subscribe(res => {
       this.departments = res['data'];
@@ -225,6 +227,7 @@ export class EnrollRoomComponent implements OnInit {
   exportStudentRoomAlwrtment() {
     let body = {
       'dateOfExam':this.dateOfExam,
+      'sittingOfExam': this.sittingOfExam,
       'title': this.titleOfExam,
       'examName': this.nameOfExam,
       'selectedRooms': this.selectedRooms,

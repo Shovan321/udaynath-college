@@ -43,7 +43,7 @@ public class RoomArrangementResource {
 		List<String> collect = Stream.of(split).map(d -> d.trim()).collect(Collectors.toList());
 		String date = collect.get(2) + "." + collect.get(1) + "." + collect.get(0);
 		dto.setDateOfExam(date);
-
+		String sittingOfExam = dto.getSittingOfExam();
 		service.getRoomArrangementReport(response, dto, zipOut);
 		service.getDutyLitReport(response, dto, zipOut);
 		
@@ -59,7 +59,7 @@ public class RoomArrangementResource {
 					.orElse(new RoomAndInvigilatorDetail());
 			reportRoomDTO.setTitle(dto.getTitle().toUpperCase());
 			byte[] roomArrangementReport = service.getSeatChartArrangementReport(response, reportRoomDTO,
-					invDetails, dto.getExamName(), dto.getDateOfExam());
+					invDetails, dto.getExamName(), dto.getDateOfExam(), sittingOfExam);
 			
 			if(roomArrangementReport == null) {
 				continue;

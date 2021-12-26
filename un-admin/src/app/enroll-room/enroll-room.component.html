@@ -109,23 +109,28 @@
                 </p-accordionTab> -->
                 <p-accordionTab header="Exam invigilator">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-5">
                             <input type="file" class="form-control" title="Upload" (change)="fileDataLoader($event)"
                                 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
                         </div>
                         <div class="col-md-1">
                             <button pButton type="button" label="Upload" (click)="uploadInvesiloter()"></button>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <input type="date" [(ngModel)]='dateOfExam' class="form-control" placeholder="Exam Date">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
+                            <input type="text" [(ngModel)]='sittingOfExam' class="form-control" placeholder="Sitting of exam">
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 5px;">
+                        <div class="col-md-3">
                             <input type="text" [(ngModel)]='nameOfExam' class="form-control" placeholder="Name Of Exam">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <input type="text" [(ngModel)]='titleOfExam' class="form-control" placeholder="Title">
                         </div>
-                        <div class="col-md-2" style="float:left">
+                        <div class="col-md-6" style="float:left">
                             <button type="submit" class="btn btn-primary mb-3 ml-10"
                                 (click)='exportStudentRoomAlwrtment()' [disabled]='getAssignButtonStatus()'
                                 *ngIf='titleOfExam'
@@ -137,7 +142,7 @@
                                 Delete</button>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row" style="margin-top: 5px;">
                         <div class="col-md-3" *ngFor="let room of selectedRoomsForInvesiloter">
                             <div class="drag-container">
                                 <div class="section-heading">{{room.id}}

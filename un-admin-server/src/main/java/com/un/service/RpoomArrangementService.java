@@ -13,14 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
-import org.apache.poi.xwpf.usermodel.IRunElement;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFHeader;
@@ -51,14 +49,14 @@ public class RpoomArrangementService {
 	
 	String fontFamily = "Calibri";
 
-	private void createReportHeader(ReportRoomDTO reportRoomDTO, XWPFHeaderFooterPolicy policy, String type) {
+	private void createReportHeader(ReportRoomDTO reportRoomDTO, XWPFHeaderFooterPolicy policy, String type, String date) {
 		@SuppressWarnings("static-access")
 		XWPFHeader headerD = policy.createHeader(policy.DEFAULT);
 
 		setHeaderAndTitleText(headerD.createParagraph(), UNContsant.ROOM_ARRANGEMENT_HEADER, false);
 		setHeaderAndTitleText(headerD.createParagraph(), reportRoomDTO.getTitle(), false);
 		setHeaderAndTitleText(headerD.createParagraph(), type, false);
-		setHeaderAndTitleText(headerD.createParagraph(), "Date : DD/YY/MM", true);
+		setHeaderAndTitleText(headerD.createParagraph(), "Date : "+date, true);
 	}
 
 	private void setHeaderAndTitleText(XWPFParagraph paragraph, String pText, boolean right) {
@@ -75,7 +73,7 @@ public class RpoomArrangementService {
 	}
 
 	public byte[] getSeatChartArrangementReport(HttpServletResponse response, ReportRoomDTO reportRoomDTO,
-			RoomAndInvigilatorDetail invDetails, String examName, String date)
+			RoomAndInvigilatorDetail invDetails, String examName, String date, String sittingOfExam)
 			throws IOException, ParseException {
 
 		List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
@@ -124,6 +122,7 @@ public class RpoomArrangementService {
 			DocsUtil.replaceParagraph(paragraphs.get(2), "EXAMNAMEWILLREPLACE", examName);
 			DocsUtil.replaceParagraph(paragraphs.get(3), "ROOMNAMEREPLACE", reportRoomDTO.getName());
 			DocsUtil.replaceParagraph(paragraphs.get(4), "22.04.2021", date);
+			DocsUtil.replaceParagraph(paragraphs.get(4), "SITTINGREPLACE", sittingOfExam);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -209,7 +208,8 @@ public class RpoomArrangementService {
 		row.addNewTableCell().setText("SITTING & TIMING");
 
 		List<ReportRoomDTO> selectedRooms = dto.getSelectedRooms();
-
+		String dateOfExam = dto.dateOfExam;
+		dateOfExam = getFormatedDate(dateOfExam);
 		boolean firstTime = true;
 		int rowIndex = 1;
 		for (ReportRoomDTO reportRoomDTO : selectedRooms) {
@@ -219,7 +219,7 @@ public class RpoomArrangementService {
 				if (policy.getDefaultHeader() == null && policy.getFirstPageHeader() == null
 						&& policy.getDefaultFooter() == null) {
 
-					createReportHeader(reportRoomDTO, policy, UNContsant.ROOM_ARRANGEMENT_HEADER_2);
+					createReportHeader(reportRoomDTO, policy, UNContsant.ROOM_ARRANGEMENT_HEADER_2, dateOfExam);
 				}
 				firstTime = false;
 			}
@@ -255,7 +255,7 @@ public class RpoomArrangementService {
 				String name = reportRoomDTO.getName();
 				rowIndex = getStudentDetailsReportTable(table, rowIndex, max, min, prefix, name, document);
 				signetureSheetService.generateSignetureSheet(reportRoomDTO, prefix, rollPerRoom, zipOut,
-						dto.getExamName(), dto.getDateOfExam());
+						dto.getExamName(), dto.getDateOfExam(), dto.getSittingOfExam());
 			}
 		}
 
@@ -286,7 +286,9 @@ public class RpoomArrangementService {
 				&& policy.getDefaultFooter() == null) {
 			ReportRoomDTO reportRoomDTO = selectedRooms.get(0);
 			reportRoomDTO.setTitle(dto.getExamName().toUpperCase());
-			createReportHeader(reportRoomDTO, policy, UNContsant.DUTY_LIST);
+			String dateOfExam = dto.dateOfExam;
+			dateOfExam = getFormatedDate(dateOfExam);
+			createReportHeader(reportRoomDTO, policy, UNContsant.DUTY_LIST, dateOfExam);
 		}
 		
 		XWPFTable table = document.createTable();
@@ -351,5 +353,8 @@ public class RpoomArrangementService {
 		} else {
 			return "" + number;
 		}
+	}
+	private String getFormatedDate(String dateOfExam) {
+		return dateOfExam.replaceAll("/.", "/");
 	}
 }

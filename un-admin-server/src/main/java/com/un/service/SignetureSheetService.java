@@ -43,7 +43,7 @@ public class SignetureSheetService {
 	public String sheetName;
 
 	public synchronized void generateSignetureSheet(ReportRoomDTO reportRoomDTO, String prefix,
-			List<RollNumberForSeatArrangement> rollPerRoom, ZipOutputStream zipOut, String examName, String date) {
+			List<RollNumberForSeatArrangement> rollPerRoom, ZipOutputStream zipOut, String examName, String date, String sitting) {
 		try {
 
 			String file = this.getClass().getResource("/static/signature_sheet.xlsx").getFile();
@@ -53,12 +53,11 @@ public class SignetureSheetService {
 			CellStyle cellStyle = getStyle(document);
 	        
 			Cell fCell = outputSheet.getRow(0).getCell(0);
-			RichTextString richStringCellValue = fCell.getRichStringCellValue();
-			//richStringCellValue.
 			String stringCellValue = fCell.getStringCellValue();
 			stringCellValue = stringCellValue.replace("S- 26", reportRoomDTO.getName());
 			stringCellValue = stringCellValue.replace("3RD SEMESTER EXAMINATIONS -2021", examName);
 			stringCellValue = stringCellValue.replace("20.04.2021", date);
+			stringCellValue = stringCellValue.replace("SITTINGREPLACE", sitting);
 			
 			fCell.setCellValue(stringCellValue);
 			int rowNmber = 3;
