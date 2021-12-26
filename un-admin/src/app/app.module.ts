@@ -27,6 +27,8 @@ import {DividerModule} from 'primeng/divider';
 import { HomeComponent } from './home/home.component';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { FooterComponent } from './footer/footer.component';
+import {MenubarModule} from 'primeng/menubar';
+import {MenuItem} from 'primeng/api';
 
 const modules = [
   BrowserModule,
@@ -45,7 +47,7 @@ const modules = [
   BadgeModule,
   DragDropModule,
   DividerModule,
-  
+  MenubarModule,
 ];
 @NgModule({
   declarations: [
