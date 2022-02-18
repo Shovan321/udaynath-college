@@ -33,6 +33,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.sun.el.stream.Stream;
 import com.un.dto.InvesilotersDTO;
 import com.un.dto.ReportDTO;
 import com.un.dto.ReportRoomDTO;
@@ -73,7 +74,8 @@ public class RpoomArrangementService {
 	}
 
 	public byte[] getSeatChartArrangementReport(HttpServletResponse response, ReportRoomDTO reportRoomDTO,
-			RoomAndInvigilatorDetail invDetails, String examName, String date, String sittingOfExam)
+			RoomAndInvigilatorDetail invDetails, String examName, String date, String sittingOfExam,
+			List<XWPFDocument> seatChartDocuments, Integer rollLength)
 			throws IOException, ParseException {
 
 		List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
@@ -112,19 +114,12 @@ public class RpoomArrangementService {
 			}
 		}
 
-		/*
-		 * int in = 0; for (XWPFParagraph p : paragraphs) { List<IRunElement> iRuns =
-		 * p.getIRuns(); System.out.println(p.getText() + " ====> " + (in) + "======> "
-		 * + iRuns); in++; }
-		 */
-
 		try {
 			DocsUtil.replaceParagraph(paragraphs.get(2), "EXAMNAMEWILLREPLACE", examName);
 			DocsUtil.replaceParagraph(paragraphs.get(3), "ROOMNAMEREPLACE", reportRoomDTO.getName());
 			DocsUtil.replaceParagraph(paragraphs.get(4), "22.04.2021", date);
 			DocsUtil.replaceParagraph(paragraphs.get(4), "SITTINGREPLACE", sittingOfExam);
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 		List<XWPFTable> tables = document.getTables();
 
@@ -183,7 +178,29 @@ public class RpoomArrangementService {
 				}
 			}
 		}
-
+		int rollNumberLength = rollLength != null ? rollLength : 3;
+		
+		Map<String, List<String>> countOfSTudent = rollNumberList.stream()
+			.flatMap(d -> d.stream())
+			.filter(d -> d != null && (d.length() > rollNumberLength))
+			.collect(Collectors.groupingBy(d -> d.substring(0, d.length() - rollNumberLength)));
+		
+		List<String> countList = new ArrayList<>();
+		countOfSTudent.forEach((k, v) -> {
+			int size = v.size();
+			countList.add(k+" :"+size);
+		});
+		
+		String countString = countList.stream().collect(Collectors.joining(", "));
+		DocsUtil.replaceParagraph(paragraphs.get(19), "StudentCountPerClass", "STUDENT COUNT: "+ countString);
+		
+		long totalSTudentCount = rollNumberList.stream()
+				.flatMap(d -> d.stream())
+				.filter(d -> d != null && (d.length() > rollNumberLength)).count();
+		XWPFParagraph p = paragraphs.get(11);
+		DocsUtil.replaceParagraph(p, "TOTAL", "TOTAL	-"+totalSTudentCount);
+		
+		seatChartDocuments.add(document);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		document.write(out);
 		document.close();
@@ -195,6 +212,11 @@ public class RpoomArrangementService {
 	public byte[] getRoomArrangementReport(HttpServletResponse response, ReportDTO dto, ZipOutputStream zipOut)
 			throws IOException {
 
+		int rollNumberLength = 3;
+		if(dto.getRollNumberLength() != null) {
+			rollNumberLength = dto.getRollNumberLength();
+		}
+		dto.setRollNumberLength(rollNumberLength);
 		XWPFDocument document = new XWPFDocument();
 
 		XWPFTable table = document.createTable();
@@ -236,9 +258,9 @@ public class RpoomArrangementService {
 			for (String data : rollNumberSortedList) {
 				RollNumberForSeatArrangement roll = new RollNumberForSeatArrangement();
 				int length = data.length();
-				String prefix = data.substring(0, length - 3);
+				String prefix = data.substring(0, length - rollNumberLength);
 				roll.setPrefix(prefix);
-				roll.setRollNumber(Integer.valueOf(data.substring(length - 3)));
+				roll.setRollNumber(Integer.valueOf(data.substring(length - rollNumberLength)));
 				seatArrangement.add(roll);
 			}
 

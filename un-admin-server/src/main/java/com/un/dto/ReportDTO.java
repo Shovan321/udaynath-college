@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class ReportDTO {
+	public Integer rollNumberLength;
 	public String sittingOfExam;
 	public String dateOfExam;
 	public String title;

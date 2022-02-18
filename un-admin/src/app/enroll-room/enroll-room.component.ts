@@ -28,6 +28,7 @@ export class EnrollRoomComponent implements OnInit {
   dateOfExam ='';
   sittingOfExam='';
   invesiloterSize = 0;
+  rollNumberLength = 0;
   constructor(private departmentsService: DepartmentService,
     private roomService: RoomService,
     private studentService: StudentService,
@@ -47,6 +48,7 @@ export class EnrollRoomComponent implements OnInit {
     this.nameOfExam = '';
     this.dateOfExam = '';
     this.sittingOfExam = '';
+    this.rollNumberLength;
     this.students = new StudentResponseDTO();
     this.departmentsService.getAll().subscribe(res => {
       this.departments = res['data'];
@@ -231,7 +233,8 @@ export class EnrollRoomComponent implements OnInit {
       'title': this.titleOfExam,
       'examName': this.nameOfExam,
       'selectedRooms': this.selectedRooms,
-      'selectedRoomsForInvesiloter': this.selectedRoomsForInvesiloter
+      'selectedRoomsForInvesiloter': this.selectedRoomsForInvesiloter,
+      'rollNumberLength':this.rollNumberLength
     }
     this.dashboardService.getStudentArrangment(body);
   }

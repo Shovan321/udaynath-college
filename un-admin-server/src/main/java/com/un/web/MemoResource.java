@@ -101,9 +101,9 @@ public class MemoResource {
 			String data = memoRoll.getRollMumber();
 			RollNumberForSeatArrangement roll = new RollNumberForSeatArrangement();
 			int length = data.length();
-			String prefix = data.substring(0, length - 3);
+			String prefix = data.substring(0, length - reportDTO.getRollNumberLength());
 			roll.setPrefix(prefix);
-			roll.setRollNumber(Integer.valueOf(data.substring(length - 3)));
+			roll.setRollNumber(Integer.valueOf(data.substring(length - reportDTO.getRollNumberLength())));
 			roll.setPresent(memoRoll.isStudentPresent());
 			seatArrangements.add(roll);
 		}
