@@ -41,7 +41,7 @@
                                 [(ngModel)]='room.rowCapacity'>
                         </div>
                         <div class="col-md-1">
-                            <p-checkbox name="groupname" [binary]="true" [(ngModel)]="room.checked"></p-checkbox>
+                            <p-checkbox name="groupname" [binary]="true" [(ngModel)]="room.checked" (ngModelChange)="addOrRemoveRoom(room)"></p-checkbox>
                         </div>
                     </div>
                     <div class="row">

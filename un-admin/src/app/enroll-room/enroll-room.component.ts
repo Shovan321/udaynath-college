@@ -29,6 +29,7 @@ export class EnrollRoomComponent implements OnInit {
   sittingOfExam='';
   invesiloterSize = 0;
   rollNumberLength = 0;
+
   constructor(private departmentsService: DepartmentService,
     private roomService: RoomService,
     private studentService: StudentService,
@@ -36,8 +37,6 @@ export class EnrollRoomComponent implements OnInit {
     private memoService: MemoService,
     private confirmationService: ConfirmationService,
     private notificationService: NotificationService) {
-
-
   }
 
   ngOnInit(): void {
@@ -79,15 +78,26 @@ export class EnrollRoomComponent implements OnInit {
   }
   selectedRooms = [];
   getCount() {
-    this.selectedRooms = [];
     let count = 0;
     this.rooms.forEach(e => {
       if (e.checked) {
         count = count + (e.noOfRow * e.rowCapacity);
-        this.selectedRooms.push(e);
+        //this.selectedRooms.push(e);
       }
     });
     return count;
+  }
+
+  addOrRemoveRoom(event : Room) {
+    if(!this.selectedRooms) {
+      this.selectedRooms = [];
+    }
+    if(event.checked) {
+      this.selectedRooms.push(event);
+    } else {
+      this.selectedRooms = this.selectedRooms.filter(r => r.id != event.id)
+    }
+    this.selectedRooms = JSON.parse(JSON.stringify(this.selectedRooms))
   }
 
   fileList = []

@@ -44,4 +44,8 @@ export class HomeComponent implements OnInit {
     this.username = "";
     this.password = "";
   }
+
+  isLoggedIn(){
+    return this.authonticateService.isLoggedIn;
+  }
 }

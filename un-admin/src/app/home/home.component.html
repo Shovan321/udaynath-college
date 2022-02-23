@@ -1,6 +1,6 @@
 <div class="row imgbg">
   <div class="col-md-12 allign-login-form">
-    <div class="login-form">
+    <div class="login-form" *ngIf="!isLoggedIn()">
       <img src="">
       <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>
