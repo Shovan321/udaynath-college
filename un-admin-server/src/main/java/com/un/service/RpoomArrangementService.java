@@ -33,7 +33,6 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sun.el.stream.Stream;
 import com.un.dto.InvesilotersDTO;
 import com.un.dto.ReportDTO;
 import com.un.dto.ReportRoomDTO;
@@ -94,10 +93,10 @@ public class RpoomArrangementService {
 		List<XWPFParagraph> paragraphs = document.getParagraphs();
 		List<Integer> invListOfParagraph = new ArrayList<>();
 		invListOfParagraph.add(8);
-		invListOfParagraph.add(14);
-		invListOfParagraph.add(16);
+		invListOfParagraph.add(15);
 		invListOfParagraph.add(17);
 		invListOfParagraph.add(18);
+		invListOfParagraph.add(19);
 		int invIndex = 0;
 		List<InvesilotersDTO> invesiloters = invDetails.getInvesiloters();
 		for (Integer key : invListOfParagraph) {
@@ -115,10 +114,10 @@ public class RpoomArrangementService {
 		}
 
 		try {
-			DocsUtil.replaceParagraph(paragraphs.get(2), "EXAMNAMEWILLREPLACE", examName);
-			DocsUtil.replaceParagraph(paragraphs.get(3), "ROOMNAMEREPLACE", reportRoomDTO.getName());
-			DocsUtil.replaceParagraph(paragraphs.get(4), "22.04.2021", date);
-			DocsUtil.replaceParagraph(paragraphs.get(4), "SITTINGREPLACE", sittingOfExam);
+			DocsUtil.replaceParagraph(paragraphs.get(1), "EXAMNAMEWILLREPLACE", examName);
+			DocsUtil.replaceParagraph(paragraphs.get(2), "ROOMNAMEREPLACE", reportRoomDTO.getName());
+			DocsUtil.replaceParagraph(paragraphs.get(3), "22.04.2021", date);
+			DocsUtil.replaceParagraph(paragraphs.get(3), "SITTINGREPLACE", sittingOfExam);
 		} catch (Exception e) {
 		}
 		List<XWPFTable> tables = document.getTables();
@@ -132,7 +131,10 @@ public class RpoomArrangementService {
 		for (XWPFTableRow sRow : contentTable.getRows()) {
 			for (XWPFTableCell cell : sRow.getTableCells()) {
 				cell.setVerticalAlignment(XWPFVertAlign.CENTER);
-				cell.getParagraphs().get(0).setAlignment(ParagraphAlignment.CENTER);
+				XWPFParagraph xwpfParagraph = cell.getParagraphs().get(0);
+				xwpfParagraph.setAlignment(ParagraphAlignment.CENTER);
+				XWPFRun createRun = xwpfParagraph.createRun();
+				createRun.setFontSize(10);
 			}
 		}
 
@@ -146,7 +148,8 @@ public class RpoomArrangementService {
 				ctTc.addNewTcPr().addNewTcBorders();
 
 				ctTc.getTcPr().setTcBorders(prevRowCell.getCTTc().getTcPr().getTcBorders());
-				cell.getParagraphs().get(0).setAlignment(ParagraphAlignment.CENTER);
+				XWPFParagraph xwpfParagraph = cell.getParagraphs().get(0);
+				xwpfParagraph.setAlignment(ParagraphAlignment.CENTER);
 				cell.setVerticalAlignment(XWPFVertAlign.CENTER);
 
 			}
@@ -192,13 +195,13 @@ public class RpoomArrangementService {
 		});
 		
 		String countString = countList.stream().collect(Collectors.joining(", "));
-		DocsUtil.replaceParagraph(paragraphs.get(19), "StudentCountPerClass", "STUDENT COUNT: "+ countString);
+		DocsUtil.replaceParagraph(paragraphs.get(20), "StudentCountPerClass", "STUDENT COUNT: "+ countString);
 		
 		long totalSTudentCount = rollNumberList.stream()
 				.flatMap(d -> d.stream())
 				.filter(d -> d != null && (d.length() > rollNumberLength)).count();
-		XWPFParagraph p = paragraphs.get(11);
-		DocsUtil.replaceParagraph(p, "TOTAL", "TOTAL	-"+totalSTudentCount);
+		XWPFParagraph p = paragraphs.get(13);
+		DocsUtil.replaceParagraph(p, "TOTAL", "TOTAL  ="+totalSTudentCount);
 		
 		seatChartDocuments.add(document);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -234,6 +237,8 @@ public class RpoomArrangementService {
 		dateOfExam = getFormatedDate(dateOfExam);
 		boolean firstTime = true;
 		int rowIndex = 1;
+		List<List<String>> roomsRollList = new ArrayList<>();
+		
 		for (ReportRoomDTO reportRoomDTO : selectedRooms) {
 			if (firstTime) {
 				reportRoomDTO.setTitle(dto.getExamName().toUpperCase());
@@ -275,12 +280,22 @@ public class RpoomArrangementService {
 				int max = collect.getMax();
 				int min = collect.getMin();
 				String name = reportRoomDTO.getName();
-				rowIndex = getStudentDetailsReportTable(table, rowIndex, max, min, prefix, name, document);
+				roomsRollList.add(getStudentDetailsReportTable(table, rowIndex, max, min, prefix, name, document));
 				signetureSheetService.generateSignetureSheet(reportRoomDTO, prefix, rollPerRoom, zipOut,
 						dto.getExamName(), dto.getDateOfExam(), dto.getSittingOfExam());
 			}
 		}
 
+		roomsRollList.sort((o1, o2) -> o1.get(1).compareTo(o2.get(1)));//by rooll number
+		for(List<String> cur : roomsRollList) {
+			XWPFTableRow newRow = table.createRow();
+			newRow.getCell(0).setText(rowIndex+"");
+			XWPFTableCell cell = newRow.getCell(1);
+			cell.setText(cur.get(1));
+			newRow.getCell(2).setText(cur.get(2));
+			rowIndex++;
+		}
+		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		document.write(out);
 		out.close();
@@ -355,16 +370,22 @@ public class RpoomArrangementService {
 		return responseByteArray;
 	}
 
-	private int getStudentDetailsReportTable(XWPFTable table, int rowIndex, int max, int min, String prefix,
+	private List<String> getStudentDetailsReportTable(XWPFTable table, int rowIndex, int max, int min, String prefix,
 			String name, XWPFDocument document) {
-		XWPFTableRow newRow = table.createRow();
-		newRow.getCell(0).setText((rowIndex) + "");
+		//XWPFTableRow newRow = table.createRow();
+		//newRow.getCell(0).setText((rowIndex) + "");
 		String minPrefix = getDataWithPrefix(min);
 		String maxPrefix = getDataWithPrefix(max);
-		XWPFTableCell cell = newRow.getCell(1);
-		cell.setText(prefix + minPrefix + " TO " + prefix + maxPrefix);
-		newRow.getCell(2).setText(name);
-		return rowIndex + 1;
+		//XWPFTableCell cell = newRow.getCell(1);
+		//cell.setText(prefix + minPrefix + " TO " + prefix + maxPrefix);
+		//newRow.getCell(2).setText(name);
+		
+		List<String> rowDatas = new ArrayList<>();
+		rowDatas.add((rowIndex) + "");
+		rowDatas.add(prefix + minPrefix + " TO " + prefix + maxPrefix);
+		rowDatas.add(name);
+		//return rowIndex + 1;
+		return rowDatas;
 	}
 
 	String getDataWithPrefix(int number) {

@@ -45,11 +45,18 @@ public class MemoPatternGenrater {
 		}
 
 		List<String> outputStrings = new ArrayList<>();
-		outputStrings.add((prefix +"" + (output.substring(0, output.length()-2))).toUpperCase().trim()+ " = "+count);
+		try {
+			if(output != null && !output.trim().isEmpty())
+			outputStrings.add((prefix +"" + (output.substring(0, output.length()-2))).toUpperCase().trim()+ " = "+count);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		String absentString = absentStudent.stream().filter(p -> p!= null)
 				.map(rollnumber -> prefix+ getDataWithPrefix(rollnumber))
 				.collect(Collectors.joining(", "));
-		outputStrings.add(absentString+" = " + absentStudent.size());
+		if(absentString != null && !absentString.trim().isEmpty()) {
+			outputStrings.add(absentString+" = " + absentStudent.size());			
+		}
 		return outputStrings;
 	}
 	

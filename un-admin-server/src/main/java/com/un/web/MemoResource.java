@@ -39,6 +39,7 @@ import com.un.dto.ReportDTO;
 import com.un.dto.ReportRoomDTO;
 import com.un.dto.RollNumberForSeatArrangement;
 import com.un.service.MemoService;
+import com.un.util.DocsUtil;
 import com.un.util.MemoPatternGenrater;
 
 @RestController
@@ -118,28 +119,63 @@ public class MemoResource {
 					.sorted(Comparator.comparing(RollNumberForSeatArrangement::getRollNumber))
 					.collect(Collectors.toList());
 			List<String> memoString = MemoPatternGenrater.getMemoString(seats, stream);
-			generateReport(memoString, stream, zipOut);
+			
+			List<List<RollNumberForSeatArrangement>> presentStudentList = new ArrayList<>();
+			List<RollNumberForSeatArrangement> pStudents = new ArrayList<>();
+			List<Integer> absentStudent = new ArrayList<>();
+			int index = 0;
+			for (RollNumberForSeatArrangement seat : seats) {
+				index++;
+				if (seat.isPresent()) {
+					pStudents.add(seat);
+					if(index == seats.size()) {
+						presentStudentList.add(pStudents);
+					}
+				} else {
+					if(!pStudents.isEmpty()) {
+						presentStudentList.add(pStudents);					
+					}
+					pStudents = new ArrayList<>();
+					absentStudent.add(seat.getRollNumber());
+				}
+			}
+			long count = presentStudentList.stream().flatMap(d -> d.stream()).count();
+			
+			String dateOfExam = reportDTO.getDateOfExam();
+			generateReport(memoString, stream, zipOut, reportDTO.getExamName(), dateOfExam, count);
 		}
 
 	}
 
-	private void generateReport(List<String> memoString, String name, ZipOutputStream zipOut) {
+	private void generateReport(List<String> memoString, String name, ZipOutputStream zipOut, String examName, String dateOfExam, long presentCount) {
 		String file = this.getClass().getResource("/static/Memo.docx").getFile();
 		try {
 			InputStream input = new FileInputStream(file);
 			XWPFDocument document = new XWPFDocument(input);
+			
+			List<XWPFParagraph> paragraphs = document.getParagraphs();
+			
+			  for(int i =0; i< paragraphs.size(); i++) {
+			  System.out.println(i+"\t"+paragraphs.get(i).getText()); }
+			 
+			
+			DocsUtil.replaceParagraph(paragraphs.get(11), "EXAMNAMETOREPLACE", examName);
+			DocsUtil.replaceParagraph(paragraphs.get(15), "REPLACEDATE", dateOfExam);
+			DocsUtil.replaceParagraph(paragraphs.get(16), "161", ""+presentCount);
 			List<XWPFTable> tables = document.getTables();
 
 			for (XWPFTable table : tables) {
 				for (XWPFTableRow row : table.getRows()) {
 					for (XWPFTableCell cell : row.getTableCells()) {
+						if(memoString.size() >=1)
 						cell.setText(memoString.get(0));
 					}
 				}
 			}
 
-			XWPFParagraph xwpfParagraph = document.getParagraphs().get(24);
+			XWPFParagraph xwpfParagraph = paragraphs.get(24);
 			XWPFRun dataRun = xwpfParagraph.createRun();
+			if(memoString.size() >= 2)
 			dataRun.setText("C.Absentee Roll Nos.  " + memoString.get(1));
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();

@@ -38,7 +38,7 @@ public class RoomArrangementResource {
 
 	@Autowired
 	private MemoService memoService;
-	
+
 	@Autowired
 	WordUtils wordUtils;
 
@@ -53,7 +53,7 @@ public class RoomArrangementResource {
 		String sittingOfExam = dto.getSittingOfExam();
 		service.getRoomArrangementReport(response, dto, zipOut);
 		service.getDutyLitReport(response, dto, zipOut);
-		
+
 		List<ReportRoomDTO> selectedRooms = dto.getSelectedRooms();
 		List<RoomAndInvigilatorDetail> selectedRoomsForInvesiloter = dto.getSelectedRoomsForInvesiloter();
 		ArrayList<XWPFDocument> allDocuments = new ArrayList<>();
@@ -66,10 +66,10 @@ public class RoomArrangementResource {
 					.filter(r -> r.getId().equals(reportRoomDTO.getName())).findAny()
 					.orElse(new RoomAndInvigilatorDetail());
 			reportRoomDTO.setTitle(dto.getTitle().toUpperCase());
-			byte[] roomArrangementReport = service.getSeatChartArrangementReport(response, reportRoomDTO,
-					invDetails, dto.getExamName(), dto.getDateOfExam(), sittingOfExam, allDocuments, dto.getRollNumberLength());
-			
-			if(roomArrangementReport == null) {
+			byte[] roomArrangementReport = service.getSeatChartArrangementReport(response, reportRoomDTO, invDetails,
+					dto.getExamName(), dto.getDateOfExam(), sittingOfExam, allDocuments, dto.getRollNumberLength());
+
+			if (roomArrangementReport == null) {
 				continue;
 			}
 			String name = reportRoomDTO.getName();
@@ -81,29 +81,33 @@ public class RoomArrangementResource {
 			StreamUtils.copy(inputStream, zipOut);
 			zipOut.closeEntry();
 		}
-		
-		//For all seatcharts
-		/*
-		 * { Stream<XWPFDocument> stream = allDocuments.stream(); XWPFDocument
-		 * mergeDocuments = wordUtils.mergeDocuments(stream); ByteArrayOutputStream out
-		 * = new ByteArrayOutputStream(); mergeDocuments.write(out); out.close();
-		 * mergeDocuments.close();
-		 * 
-		 * byte[] allRoomDetails = out.toByteArray();
-		 * 
-		 * ZipEntry zipEntry = new ZipEntry("All room - Seat Chart" + ".docx");
-		 * zipEntry.setSize(allRoomDetails.length); zipOut.putNextEntry(zipEntry);
-		 * 
-		 * InputStream inputStream = new ByteArrayInputStream(allRoomDetails);
-		 * StreamUtils.copy(inputStream, zipOut); zipOut.closeEntry(); }
-		 */
-		
-		
+
+		// For all seatcharts
+
+		{
+			Stream<XWPFDocument> stream = allDocuments.stream();
+			XWPFDocument mergeDocuments = wordUtils.mergeDocuments(stream);
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			mergeDocuments.write(out);
+			out.close();
+			mergeDocuments.close();
+
+			byte[] allRoomDetails = out.toByteArray();
+
+			ZipEntry zipEntry = new ZipEntry("All room - Seat Chart" + ".docx");
+			zipEntry.setSize(allRoomDetails.length);
+			zipOut.putNextEntry(zipEntry);
+
+			InputStream inputStream = new ByteArrayInputStream(allRoomDetails);
+			StreamUtils.copy(inputStream, zipOut);
+			zipOut.closeEntry();
+		}
+
 		memoService.save(dto);
 		zipOut.finish();
 		zipOut.close();
 		response.setStatus(HttpServletResponse.SC_OK);
-		String zipFileName = dto.getTitle() +".zip";
+		String zipFileName = dto.getTitle() + ".zip";
 		response.setHeader(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "*");
 		response.addHeader("file-name", zipFileName);
 		response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipFileName + "\"");
