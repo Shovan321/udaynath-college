@@ -57,6 +57,9 @@ public class MemoResource {
 			for (ReportRoomDTO roomDTO : selectedRooms) {
 				List<List<String>> rollNumberList = roomDTO.getRollNumberList();
 				List<List<MemoRollNumber>> memoRollNumbersList = new ArrayList<>();
+				if(rollNumberList == null) {
+					continue;
+				}
 				for (List<String> rollNumbers : rollNumberList) {
 					List<MemoRollNumber> memoRollNumbers = new ArrayList<>();
 

@@ -72,6 +72,9 @@ public class MemoService {
 		for (ReportRoomDTO reportRoomDTO : selectedRooms) {
 			List<List<String>> rollNumberList = reportRoomDTO.getRollNumberList();
 			List<List<String>> newRollNumberList = new ArrayList<>();
+			if(rollNumberList == null) {
+				continue;
+			}
 			for (List<String> rollNumbers : rollNumberList) {
 				List<String> newRollnumbers = rollNumbers.stream()
 					.filter(p -> p != null && !p.isEmpty())
