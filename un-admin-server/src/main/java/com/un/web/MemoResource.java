@@ -81,7 +81,8 @@ public class MemoResource {
 
 	@PostMapping(produces = "application/zip")
 	public void downloadmemoDetails(HttpServletResponse response, @RequestBody MemoDTO memoDTO) throws IOException {
-
+		Boolean isElective = memoDTO.getReportDTO().getElective();
+		isElective = isElective == null ? false : isElective;
 		ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream());
 
 		ReportDTO reportDTO = memoDTO.getReportDTO();
@@ -116,37 +117,82 @@ public class MemoResource {
 				.collect(Collectors.groupingBy(RollNumberForSeatArrangement::getPrefix));
 
 		Set<String> allStream = rollNumberGroup.keySet();
-		for (String stream : allStream) {
-			List<RollNumberForSeatArrangement> seats = rollNumberGroup.get(stream);
-			seats = seats.stream().filter(p -> p != null).filter(p -> p.getRollNumber() != null)
-					.sorted(Comparator.comparing(RollNumberForSeatArrangement::getRollNumber))
-					.collect(Collectors.toList());
-			List<String> memoString = MemoPatternGenrater.getMemoString(seats, stream);
-			
-			List<List<RollNumberForSeatArrangement>> presentStudentList = new ArrayList<>();
-			List<RollNumberForSeatArrangement> pStudents = new ArrayList<>();
-			List<Integer> absentStudent = new ArrayList<>();
-			int index = 0;
-			for (RollNumberForSeatArrangement seat : seats) {
-				index++;
-				if (seat.isPresent()) {
-					pStudents.add(seat);
-					if(index == seats.size()) {
-						presentStudentList.add(pStudents);
-					}
-				} else {
-					if(!pStudents.isEmpty()) {
-						presentStudentList.add(pStudents);					
-					}
-					pStudents = new ArrayList<>();
-					absentStudent.add(seat.getRollNumber());
-				}
-			}
-			long count = presentStudentList.stream().flatMap(d -> d.stream()).count();
-			
+		if(isElective) {
+			List<String> allMemoString = new ArrayList<>();
+			allMemoString.add("");
+			allMemoString.add("");
+			long totalCount = 0;
 			String dateOfExam = reportDTO.getDateOfExam();
-			generateReport(memoString, stream, zipOut, reportDTO.getExamName(), dateOfExam, count);
+			for (String stream : allStream) {
+				List<RollNumberForSeatArrangement> seats = rollNumberGroup.get(stream);
+				seats = seats.stream().filter(p -> p != null).filter(p -> p.getRollNumber() != null)
+						.sorted(Comparator.comparing(RollNumberForSeatArrangement::getRollNumber))
+						.collect(Collectors.toList());
+				List<String> memoString = MemoPatternGenrater.getMemoString(seats, stream);
+				
+				List<List<RollNumberForSeatArrangement>> presentStudentList = new ArrayList<>();
+				List<RollNumberForSeatArrangement> pStudents = new ArrayList<>();
+				List<Integer> absentStudent = new ArrayList<>();
+				int index = 0;
+				for (RollNumberForSeatArrangement seat : seats) {
+					index++;
+					if (seat.isPresent()) {
+						pStudents.add(seat);
+						if(index == seats.size()) {
+							presentStudentList.add(pStudents);
+						}
+					} else {
+						if(!pStudents.isEmpty()) {
+							presentStudentList.add(pStudents);					
+						}
+						pStudents = new ArrayList<>();
+						absentStudent.add(seat.getRollNumber());
+					}
+				}
+				long count = presentStudentList.stream().flatMap(d -> d.stream()).count();
+				
+				allMemoString.set(0, allMemoString.get(0) + memoString.get(0) + "--");
+				if(memoString.size() == 2) {
+					allMemoString.set(1, allMemoString.get(1) + memoString.get(1) + "--");					
+				}
+				
+				totalCount = totalCount + count;
+			}
+			generateReport(allMemoString, "Elective", zipOut, reportDTO.getExamName(), dateOfExam, totalCount);
+		} else {
+			for (String stream : allStream) {
+				List<RollNumberForSeatArrangement> seats = rollNumberGroup.get(stream);
+				seats = seats.stream().filter(p -> p != null).filter(p -> p.getRollNumber() != null)
+						.sorted(Comparator.comparing(RollNumberForSeatArrangement::getRollNumber))
+						.collect(Collectors.toList());
+				List<String> memoString = MemoPatternGenrater.getMemoString(seats, stream);
+				
+				List<List<RollNumberForSeatArrangement>> presentStudentList = new ArrayList<>();
+				List<RollNumberForSeatArrangement> pStudents = new ArrayList<>();
+				List<Integer> absentStudent = new ArrayList<>();
+				int index = 0;
+				for (RollNumberForSeatArrangement seat : seats) {
+					index++;
+					if (seat.isPresent()) {
+						pStudents.add(seat);
+						if(index == seats.size()) {
+							presentStudentList.add(pStudents);
+						}
+					} else {
+						if(!pStudents.isEmpty()) {
+							presentStudentList.add(pStudents);					
+						}
+						pStudents = new ArrayList<>();
+						absentStudent.add(seat.getRollNumber());
+					}
+				}
+				long count = presentStudentList.stream().flatMap(d -> d.stream()).count();
+				
+				String dateOfExam = reportDTO.getDateOfExam();
+				generateReport(memoString, stream, zipOut, reportDTO.getExamName(), dateOfExam, count);
+			}
 		}
+		
 
 	}
 
@@ -158,28 +204,40 @@ public class MemoResource {
 			
 			List<XWPFParagraph> paragraphs = document.getParagraphs();
 			
-			  for(int i =0; i< paragraphs.size(); i++) {
-			  System.out.println(i+"\t"+paragraphs.get(i).getText()); }
-			 
-			
 			DocsUtil.replaceParagraph(paragraphs.get(11), "EXAMNAMETOREPLACE", examName);
 			DocsUtil.replaceParagraph(paragraphs.get(15), "REPLACEDATE", dateOfExam);
 			DocsUtil.replaceParagraph(paragraphs.get(16), "161", ""+presentCount);
 			List<XWPFTable> tables = document.getTables();
 
 			for (XWPFTable table : tables) {
-				for (XWPFTableRow row : table.getRows()) {
-					for (XWPFTableCell cell : row.getTableCells()) {
-						if(memoString.size() >=1)
-						cell.setText(memoString.get(0));
+				String[] split = memoString.get(0).split("--");
+				int rowIndex = 0;
+				for(String text : split) {
+					XWPFTableRow row = table.getRow(rowIndex);
+					if(row == null) {
+						row = table.createRow();
 					}
+					XWPFTableCell cell = row.getCell(0);
+					if(cell == null) {
+						cell = row.createCell();
+					}
+					cell.setText(text);
+					rowIndex++;
 				}
 			}
 
 			XWPFParagraph xwpfParagraph = paragraphs.get(24);
-			XWPFRun dataRun = xwpfParagraph.createRun();
-			if(memoString.size() >= 2)
-			dataRun.setText("C.Absentee Roll Nos.  " + memoString.get(1));
+			if(memoString.size() >= 2) {
+				String[] strings = memoString.get(1).split("--");
+				XWPFRun dataRun = xwpfParagraph.createRun();
+				dataRun.setText("C. Absentee Roll Nos.  ");
+				dataRun.addBreak();
+				for(String text : strings) {
+					dataRun = xwpfParagraph.createRun();
+					dataRun.setText("\t\t"+text);
+					dataRun.addBreak();
+				}
+			}
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			document.write(out);

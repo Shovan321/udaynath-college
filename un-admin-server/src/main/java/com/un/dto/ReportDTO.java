@@ -13,4 +13,5 @@ public class ReportDTO {
 	public String examName;
 	public List<ReportRoomDTO> selectedRooms;
 	public List<RoomAndInvigilatorDetail> selectedRoomsForInvesiloter;
+	public Boolean elective;
 }
