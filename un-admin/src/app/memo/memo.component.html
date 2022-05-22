@@ -1,7 +1,6 @@
 <!-- {{response | json}} -->
 <div class="screen-css">
-    
-<div class="row">
+  <div class="row">
     <div class="col-md-3">
       <p-dropdown
         [options]="memoDetails.memoModels"
@@ -14,7 +13,7 @@
       >
       </p-dropdown>
     </div>
-  
+
     <div class="col-md-9" *ngIf="selectedMemo.reportDTO">
       <button
         pButton
@@ -48,19 +47,34 @@
                 item.memoRollNumberList && item.memoRollNumberList.length != 0
               "
             >
+              <div class="col-md-12" style="text-align: right">
+                <button
+                  type="button"
+                  pButton
+                  (click)="showDialog(item.memoRollNumberList)"
+                  icon="pi pi-external-link"
+                ></button>
+              </div>
               <div
                 *ngFor="
                   let itemRools of item.memoRollNumberList;
                   let index = index
                 "
                 style="margin-bottom: 10px"
-                
               >
                 <div class="row">
-                  <span class="column-name-style">{{ "C" }}{{ index + 1 }}</span>
+                  <div class="col-md-12">
+                    <span class="column-name-style"
+                      >{{ "C" }}{{ index + 1 }}</span
+                    >
+                  </div>
                   <ng-template let-st [ngForOf]="itemRools" ngFor>
-                    <div class="col-md-1" style="border: 1px solid #2196F3;" [style.background]="getColor(st)">
-                      <span style="text-align: center; ">
+                    <div
+                      class="col-md-1"
+                      style="border: 1px solid #2196f3"
+                      [style.background]="getColor(st)"
+                    >
+                      <span style="text-align: center">
                         {{ st.rollMumber
                         }}<p-checkbox
                           [(ngModel)]="st.studentPresent"
@@ -84,5 +98,61 @@
     header="Confirmation"
     icon="pi pi-exclamation-triangle"
   ></p-confirmDialog>
-  
+  <p-dialog
+    header="Student List"
+    [(visible)]="displayAbsentList"
+    [style]="{ width: '800px','min-height':'75vh','max-height':'75vh' }"
+  >
+    <div class="row" >
+      <div class="col-md-4">
+        <span class="p-input-icon-right">
+          <i class="pi pi-search"></i>
+          <input
+            type="text"
+            pInputText
+            placeholder="Search"
+            [(ngModel)]="searchText"
+            class="form-control"
+          />
+        </span>
+      </div>
+      <div class="col-md-4">
+        <p-toggleButton onLabel="Present" offLabel="Absent"
+            [onIcon]="'pi pi-check'" [offIcon]="'pi pi-times'" [style]="{'color': 'white'}" [(ngModel)]="presentStudentStatus"></p-toggleButton>
+      </div>
+    </div>
+    <div class="row" style="pointer-events: none" style="height: 50vh;">
+      <div
+        *ngFor="let roles of itemRools; let index = index"
+        style="margin-bottom: 10px"
+      >
+        <div class="row">
+          <div class="col-md-12">
+            <span class="column-name-style">{{ "C" }}{{ index + 1 }}</span>
+          </div>
+          <ng-template let-st [ngForOf]="roles | cfilter: searchText" ngFor>
+            <div
+              class="col-md-3"
+              style="border: 1px solid #2196f3"
+              *ngIf="st.studentPresent == presentStudentStatus"
+            >
+              <span style="text-align: center">
+                {{ st.rollMumber }}
+              </span>
+            </div>
+          </ng-template>
+        </div>
+        <p-divider></p-divider>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <!-- <p-button icon="pi pi-check" (click)="saveChanged()" label="Submit" styleClass="p-button-text"></p-button> -->
+      <p-button
+        icon="pi pi-times"
+        (click)="cancel()"
+        label="OK"
+        styleClass="p-button-text"
+      ></p-button>
+    </ng-template>
+  </p-dialog>
 </div>

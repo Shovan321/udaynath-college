@@ -16,9 +16,15 @@ export class MemoComponent implements OnInit {
     private notificationService : NotificationService) { }
   memoDetails: MemoReportModel = new MemoReportModel();
   selectedMemo: MemoDetail = new MemoDetail();
+  displayAbsentList = false;
+  searchText = "";
+  presentStudentStatus = false;
   ngOnInit(): void {
     this.memoDetails = new MemoReportModel();;
     this.selectedMemo = new MemoDetail();
+    this.displayAbsentList = false;
+    this.presentStudentStatus = false;
+    this.searchText = "";
     this.findAll();
   }
   findAll() {
@@ -87,5 +93,21 @@ export class MemoComponent implements OnInit {
   getColor(st){
     let color = st.studentPresent ? '': '#99b1d2';
     return color;
+  }
+  itemRools = [];
+  selectedRoles = [];
+  showDialog(itemRools){
+    this.searchText = "";
+    this.presentStudentStatus = false;
+    this.displayAbsentList = true;
+    this.selectedRoles = itemRools;
+    this.itemRools = JSON.parse(JSON.stringify(itemRools));
+  }
+  saveChanged(){
+    //this.selectedRoles = JSON.parse(JSON.stringify(this.itemRools));
+    this.cancel();
+  }
+  cancel(){
+    this.displayAbsentList = false;
   }
 }

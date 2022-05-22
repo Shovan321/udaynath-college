@@ -31,6 +31,8 @@ import {MenubarModule} from 'primeng/menubar';
 import {MenuItem} from 'primeng/api';
 import {InputSwitchModule} from 'primeng/inputswitch';
 import {ToggleButtonModule} from 'primeng/togglebutton';
+import {DialogModule} from 'primeng/dialog';
+import {CfilterPipe} from './services/cfilter.pipe';
 
 const modules = [
   BrowserModule,
@@ -51,7 +53,8 @@ const modules = [
   DividerModule,
   MenubarModule,
   InputSwitchModule,
-  ToggleButtonModule
+  ToggleButtonModule,
+  DialogModule
 ];
 @NgModule({
   declarations: [
@@ -63,6 +66,7 @@ const modules = [
     MemoComponent,
     HomeComponent,
     FooterComponent,
+    CfilterPipe
   ],
   imports: [
     modules
