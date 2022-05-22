@@ -20,8 +20,6 @@ import com.un.dto.InvesilotersDTO;
 import com.un.dto.RoomInveiloterDTO;
 import com.un.service.InvesiloterService;
 
-import lombok.extern.slf4j.Slf4j;
-
 @RestController
 @RequestMapping(value = "/api/invesiloters")
 public class InvesiloterResource {
