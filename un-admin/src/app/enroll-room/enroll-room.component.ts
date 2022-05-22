@@ -29,6 +29,7 @@ export class EnrollRoomComponent implements OnInit {
   sittingOfExam='';
   invesiloterSize = 0;
   rollNumberLength = 0;
+  isElective =false;
 
   constructor(private departmentsService: DepartmentService,
     private roomService: RoomService,
@@ -48,6 +49,7 @@ export class EnrollRoomComponent implements OnInit {
     this.dateOfExam = '';
     this.sittingOfExam = '';
     this.rollNumberLength;
+    this.isElective = false;
     this.students = new StudentResponseDTO();
     this.departmentsService.getAll().subscribe(res => {
       this.departments = res['data'];
@@ -238,6 +240,7 @@ export class EnrollRoomComponent implements OnInit {
   }
   exportStudentRoomAlwrtment() {
     let body = {
+      'elective':this.isElective,
       'dateOfExam':this.dateOfExam,
       'sittingOfExam': this.sittingOfExam,
       'title': this.titleOfExam,

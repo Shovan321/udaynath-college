@@ -29,6 +29,8 @@ import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { FooterComponent } from './footer/footer.component';
 import {MenubarModule} from 'primeng/menubar';
 import {MenuItem} from 'primeng/api';
+import {InputSwitchModule} from 'primeng/inputswitch';
+import {ToggleButtonModule} from 'primeng/togglebutton';
 
 const modules = [
   BrowserModule,
@@ -48,6 +50,8 @@ const modules = [
   DragDropModule,
   DividerModule,
   MenubarModule,
+  InputSwitchModule,
+  ToggleButtonModule
 ];
 @NgModule({
   declarations: [
@@ -58,7 +62,7 @@ const modules = [
     EnrollRoomComponent,
     MemoComponent,
     HomeComponent,
-    FooterComponent
+    FooterComponent,
   ],
   imports: [
     modules

@@ -54,20 +54,23 @@
                   let index = index
                 "
                 style="margin-bottom: 10px"
+                
               >
-                <div class="p-inputgroup">
+                <div class="row">
                   <span class="column-name-style">{{ "C" }}{{ index + 1 }}</span>
-                  <div *ngFor="let st of itemRools" style="padding: 5px">
-                    <span style="text-align: center; margin:0 15px;">
-                      {{ st.rollMumber
-                      }}<p-checkbox
-                        [(ngModel)]="st.studentPresent"
-                        binary="true"
-                        inputId="binary"
-                      >
-                      </p-checkbox>
-                    </span>
-                  </div>
+                  <ng-template let-st [ngForOf]="itemRools" ngFor>
+                    <div class="col-md-1" style="border: 1px solid #2196F3;" [style.background]="getColor(st)">
+                      <span style="text-align: center; ">
+                        {{ st.rollMumber
+                        }}<p-checkbox
+                          [(ngModel)]="st.studentPresent"
+                          binary="true"
+                          inputId="binary"
+                        >
+                        </p-checkbox>
+                      </span>
+                    </div>
+                  </ng-template>
                 </div>
                 <p-divider></p-divider>
               </div>

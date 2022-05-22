@@ -77,3 +77,6 @@
     cursor: pointer;
     font-size: 18px;
   }
+  .p-togglebutton.p-button .p-button-icon-left, .p-togglebutton.p-button .p-button-icon-right{
+    color: white !important;
+  }

@@ -84,4 +84,8 @@ export class MemoComponent implements OnInit {
         window.URL.revokeObjectURL(data);
     });
   }
+  getColor(st){
+    let color = st.studentPresent ? '': '#99b1d2';
+    return color;
+  }
 }

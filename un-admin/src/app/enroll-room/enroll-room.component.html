@@ -133,7 +133,11 @@
                         <div class="col-md-3">
                             <input type="text" [(ngModel)]='titleOfExam' class="form-control" placeholder="Title">
                         </div>
-                        <div class="col-md-6" style="float:left">
+                        <div class="col-md-1">
+                            <p-toggleButton [onLabel]="'Elective'" offLabel="Elective"
+            [onIcon]="'pi pi-check'" [offIcon]="'pi pi-times'" [style]="{'color': 'white'}" [(ngModel)]="isElective"></p-toggleButton>
+                        </div>
+                        <div class="col-md-4" style="float:left">
                             <button type="submit" class="btn btn-primary mb-3 ml-10"
                                 (click)='exportStudentRoomAlwrtment()' [disabled]='getAssignButtonStatus()'
                                 *ngIf='titleOfExam'
